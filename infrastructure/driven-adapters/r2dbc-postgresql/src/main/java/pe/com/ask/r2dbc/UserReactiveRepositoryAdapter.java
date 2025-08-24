@@ -33,7 +33,12 @@ public class UserReactiveRepositoryAdapter extends ReactiveAdapterOperations<
     }
 
     @Override
-    public Mono<User> insert(User user){
+    public Mono<User> findByEmail(String email) {
+        return super.repository.findByEmail(email);
+    }
+
+    @Override
+    public Mono<User> signUp(User user){
         return super.save(user);
     }
 }

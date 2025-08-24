@@ -6,7 +6,7 @@ import java.math.BigDecimal;
 import java.util.Date;
 import java.util.UUID;
 
-public record RegisterUserDTO(
+public record SignUpDTO(
         UUID id,
 
         @NotBlank(message = "Name cannot be blank")

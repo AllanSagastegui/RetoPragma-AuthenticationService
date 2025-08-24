@@ -13,7 +13,8 @@ import static org.springframework.web.reactive.function.server.RouterFunctions.r
 public class UserRouterRest {
     @Bean
     public RouterFunction<ServerResponse> userRouterFunction(UserHandler userHandler, GlobalExceptionFilter filter) {
-        return route(POST("/api/v1/usuarios"), userHandler::listenPOSTRegisterUserUseCase)
-                /*.filter(filter)*/;
+        return route(POST("/api/v1/usuarios"), userHandler::listenPOSTSignUpUseCase)
+                .andRoute(POST("/api/v1/login"), userHandler::listenPOSTSignInUseCase)
+                .filter(filter);
     }
 }

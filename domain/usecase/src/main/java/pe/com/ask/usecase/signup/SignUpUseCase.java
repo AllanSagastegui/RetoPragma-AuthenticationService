@@ -28,7 +28,7 @@ public class SignUpUseCase {
                                 .flatMap(role -> {
                                     user.setPassword(passwordHasher.hash(user.getPassword()));
                                     user.setIdRole(role.getId());
-                                    return userRepository.insert(user);
+                                    return userRepository.signUp(user);
                                 })
                         )
         );
