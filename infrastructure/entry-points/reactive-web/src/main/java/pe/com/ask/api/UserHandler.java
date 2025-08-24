@@ -7,7 +7,7 @@ import org.springframework.web.reactive.function.server.ServerResponse;
 import pe.com.ask.api.dto.request.RegisterUserDTO;
 import pe.com.ask.api.exception.service.ValidationService;
 import pe.com.ask.api.mapper.UserMapper;
-import pe.com.ask.usecase.registeruser.RegisterUserUseCase;
+import pe.com.ask.usecase.signup.SignUpUseCase;
 import reactor.core.publisher.Mono;
 
 import java.net.URI;
@@ -16,14 +16,14 @@ import java.net.URI;
 @RequiredArgsConstructor
 public class UserHandler {
     private final UserMapper mapper;
-    private final RegisterUserUseCase registerUserUseCase;
+    private final SignUpUseCase signUpUseCase;
     private final ValidationService validationService;
 
     public Mono<ServerResponse> listenPOSTRegisterUserUseCase(ServerRequest serverRequest) {
         return serverRequest.bodyToMono(RegisterUserDTO.class)
                 .flatMap(validationService::validate)
                 .map(mapper::toEntity)
-                .flatMap(registerUserUseCase::saveUser)
+                .flatMap(signUpUseCase::signUpUser)
                 .map(mapper::toResponse)
                 .flatMap(response
                         -> ServerResponse.created(URI.create("/api/v1/usuarios/")).bodyValue(response));

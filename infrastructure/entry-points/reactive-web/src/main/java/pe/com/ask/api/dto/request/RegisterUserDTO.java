@@ -28,8 +28,5 @@ public record RegisterUserDTO(
         @NotNull(message = "Base salary cannot be null")
         @DecimalMin(value= "0.0", inclusive = true, message = "Base salary cannot be less than 0")
         @DecimalMax(value = "15000000.0", inclusive = true, message = "Base salary cannot exceed 15,000,000")
-        BigDecimal baseSalary,
-
-        @NotNull(message = "Role cannot be blank")
-        UUID idRole
+        BigDecimal baseSalary
 ) { }

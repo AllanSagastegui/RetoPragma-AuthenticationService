@@ -1,4 +1,4 @@
-package pe.com.ask.passwordhasher;
+package pe.com.ask.security.adapters;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -7,8 +7,7 @@ import pe.com.ask.model.user.gateways.PasswordHasher;
 
 @Component
 @RequiredArgsConstructor
-public class PasswordHasherHelper implements PasswordHasher {
-
+public class PasswordHasherAdapter implements PasswordHasher {
     private final PasswordEncoder passwordEncoder;
 
     @Override

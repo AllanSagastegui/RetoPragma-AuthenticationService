@@ -14,6 +14,6 @@ public class UserRouterRest {
     @Bean
     public RouterFunction<ServerResponse> userRouterFunction(UserHandler userHandler, GlobalExceptionFilter filter) {
         return route(POST("/api/v1/usuarios"), userHandler::listenPOSTRegisterUserUseCase)
-                .filter(filter);
+                /*.filter(filter)*/;
     }
 }

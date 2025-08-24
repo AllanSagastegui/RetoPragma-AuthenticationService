@@ -7,9 +7,8 @@ import org.springframework.context.annotation.FilterType;
 import pe.com.ask.model.role.gateways.RoleRepository;
 import pe.com.ask.model.user.gateways.PasswordHasher;
 import pe.com.ask.model.user.gateways.UserRepository;
-import pe.com.ask.usecase.createrole.CreateRoleUseCase;
 import pe.com.ask.model.gateways.TransactionalGateway;
-import pe.com.ask.usecase.registeruser.RegisterUserUseCase;
+import pe.com.ask.usecase.signup.SignUpUseCase;
 
 @Configuration
 @ComponentScan(basePackages = "pe.com.ask.usecase",
@@ -20,16 +19,11 @@ import pe.com.ask.usecase.registeruser.RegisterUserUseCase;
 public class UseCasesConfig {
 
     @Bean
-    public RegisterUserUseCase registerUserUseCase(
+    public SignUpUseCase signUpUseCase(
             UserRepository userRepository,
             RoleRepository roleRepository,
             PasswordHasher passwordHasher,
             TransactionalGateway transactionalGateway) {
-        return new RegisterUserUseCase(userRepository, roleRepository, passwordHasher, transactionalGateway);
-    }
-
-    @Bean
-    public CreateRoleUseCase createRoleUseCase(RoleRepository roleRepository) {
-        return new CreateRoleUseCase(roleRepository);
+        return new SignUpUseCase(userRepository, roleRepository, passwordHasher, transactionalGateway);
     }
 }
