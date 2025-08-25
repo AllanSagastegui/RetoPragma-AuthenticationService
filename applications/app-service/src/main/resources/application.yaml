@@ -39,5 +39,5 @@ adapters:
     port: 5432
     database: "auth_pragma"
     schema: "public"
-    username: "theask"
-    password: "elAllan!!12345"
+    username: ${DB_USER}
+    password: ${DB_PASSWORD}
