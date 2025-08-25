@@ -17,6 +17,11 @@ public record SignUpDTO(
         @Schema(description = "User's last name", example = "Sagastegui")
         String lastName,
 
+        @NotBlank(message = "DNI cannot be blank")
+        @Pattern(regexp = "\\d{8}", message = "DNI must contain exactly 8 digits")
+        @Schema(description = "National ID (DNI) of the applicant", example = "12345678")
+        String dni,
+
         @NotBlank(message = "Email cannot be blank")
         @Email(message = "A valid email address is required")
         @Schema(description = "User's email", example = "allan.sagastegui@test.com")

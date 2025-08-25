@@ -26,9 +26,9 @@ public enum ErrorCatalog {
     USER_ALREADY_EXISTS(
             "AUTH_USER_ALREADY_EXISTS",
             "User Already Exists",
-            "A user with this email already exists. Please use a different email.",
+            "A user with this information already exists. Please use different credentials.",
             409,
-            Map.of("email", "This email is already in use")
+            Map.of("email or National ID", "This email or National ID is already in use")
     ),
     VALIDATION_EXCEPTION(
             "AUTH_VALIDATION_EXCEPTION",

@@ -20,8 +20,9 @@ public class SignUpUseCase {
     private final TransactionalGateway transactionalGateway;
     private final CustomLogger customLogger;
 
-    public Mono<User> signUpUser(User user){
-        customLogger.trace("Start sign-up User flow for email: {}", user.getEmail());
+    public Mono<User> signUpUser(User user) {
+        customLogger.trace("Start sign-up User flow for email: {}, dni: {}", user.getEmail(), user.getDni());
+
         return transactionalGateway.executeInTransaction(
                 userRepository.existsByEmail(user.getEmail())
                         .doOnSubscribe(sub -> customLogger.trace("Subscribed to check if email exists: {}", user.getEmail()))
@@ -30,21 +31,30 @@ public class SignUpUseCase {
                                 customLogger.trace("User already exists with email: {}", user.getEmail());
                                 return Mono.error(new UserAlreadyExistsException());
                             }
-                            customLogger.trace("User does not exist, searching for CLIENT role");
-                            return roleRepository.findByName("CLIENT")
-                                    .doOnNext(role -> customLogger.trace("Role CLIENT found with id: {}", role.getId()))
-                                    .switchIfEmpty(Mono.defer(() -> {
-                                        customLogger.trace("Role CLIENT not found");
-                                        return Mono.error(new RoleNotFoundException());
-                                    }))
-                                    .flatMap(role -> {
-                                        user.setPassword(passwordHasher.hash(user.getPassword()));
-                                        customLogger.trace("Password hashed for user: {}", user.getEmail());
-                                        user.setIdRole(role.getId());
-                                        return userRepository.signUp(user)
-                                                .doOnSuccess(u -> customLogger.trace("User signed up successfully: {}", u.getEmail()));
+                            return userRepository.findByDni(user.getDni())
+                                    .doOnSubscribe(sub -> customLogger.trace("Checking if user exists with DNI: {}", user.getDni()))
+                                    .flatMap(existingUser -> {
+                                        if (existingUser != null) {
+                                            customLogger.trace("User already exists with DNI: {}", user.getDni());
+                                            return Mono.error(new UserAlreadyExistsException());
+                                        }
+                                        return Mono.empty();
                                     });
                         })
+                        .then(roleRepository.findByName("CLIENT")
+                                .doOnNext(role -> customLogger.trace("Role CLIENT found with id: {}", role.getId()))
+                                .switchIfEmpty(Mono.defer(() -> {
+                                    customLogger.trace("Role CLIENT not found");
+                                    return Mono.error(new RoleNotFoundException());
+                                }))
+                                .flatMap(role -> {
+                                    user.setPassword(passwordHasher.hash(user.getPassword()));
+                                    customLogger.trace("Password hashed for user: {}", user.getEmail());
+                                    user.setIdRole(role.getId());
+                                    return userRepository.signUp(user)
+                                            .doOnSuccess(u -> customLogger.trace("User signed up successfully: {}", u.getEmail()));
+                                })
+                        )
         ).doOnError(err -> customLogger.trace("Sign-up error for {}: {}", user.getEmail(), err.getMessage()));
     }
 }

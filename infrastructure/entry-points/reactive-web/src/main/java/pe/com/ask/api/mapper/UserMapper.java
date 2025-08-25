@@ -14,6 +14,7 @@ public interface UserMapper {
         return new SignUpResponse(
                 user.getName(),
                 user.getLastName(),
+                user.getDni(),
                 user.getEmail(),
                 user.getBirthday(),
                 user.getAddress(),

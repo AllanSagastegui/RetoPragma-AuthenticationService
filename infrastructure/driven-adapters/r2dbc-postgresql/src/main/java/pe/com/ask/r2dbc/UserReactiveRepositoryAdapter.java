@@ -38,6 +38,11 @@ public class UserReactiveRepositoryAdapter extends ReactiveAdapterOperations<
     }
 
     @Override
+    public Mono<User> findByDni(String dni) {
+        return super.repository.findByDni(dni);
+    }
+
+    @Override
     public Mono<User> signUp(User user){
         return super.save(user);
     }

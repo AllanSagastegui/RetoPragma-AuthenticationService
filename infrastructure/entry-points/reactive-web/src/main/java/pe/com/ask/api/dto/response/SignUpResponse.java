@@ -14,6 +14,9 @@ public record SignUpResponse(
         @Schema(description = "User's LastName", example = "Sagastegui")
         String lastName,
 
+        @Schema(description = "National ID (DNI) of the applicant", example = "12345678")
+        String dni,
+
         @Schema(description = "User's Email", example = "allan.sagastegui@test.com")
         String email,
 

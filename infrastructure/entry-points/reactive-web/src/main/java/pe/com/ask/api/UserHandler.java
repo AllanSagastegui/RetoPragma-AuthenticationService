@@ -1,11 +1,14 @@
 package pe.com.ask.api;
 
+import io.swagger.v3.oas.annotations.parameters.RequestBody;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 import org.springframework.web.reactive.function.server.ServerRequest;
 import org.springframework.web.reactive.function.server.ServerResponse;
 import pe.com.ask.api.dto.request.SignUpDTO;
 import pe.com.ask.api.dto.request.SignInDTO;
+import pe.com.ask.api.dto.response.SignInResponse;
+import pe.com.ask.api.dto.response.SignUpResponse;
 import pe.com.ask.api.exception.model.UnexpectedException;
 import pe.com.ask.api.exception.service.ValidationService;
 import pe.com.ask.api.mapper.TokenMapper;
@@ -54,6 +57,15 @@ public class UserHandler {
                 ));
     }
 
-    public void signUpDoc(SignUpDTO dto) {}
-    public void signInDoc(SignInDTO dto) {}
+    public Mono<SignUpResponse> signUpDoc(
+            @RequestBody(description = "Sign Up - Data required to register a new user")
+            SignUpDTO dto) {
+        return Mono.empty();
+    }
+
+    public Mono<SignInResponse> signInDoc(
+            @RequestBody(description = "Sign In - Credentials for user login")
+            SignInDTO dto) {
+        return Mono.empty();
+    }
 }

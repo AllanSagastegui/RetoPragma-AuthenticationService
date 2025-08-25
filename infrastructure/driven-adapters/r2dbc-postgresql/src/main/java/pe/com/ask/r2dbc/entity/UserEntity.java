@@ -28,6 +28,9 @@ public class UserEntity {
     @Column("last_name")
     private String lastName;
 
+    @Column("dni")
+    private String dni;
+
     @Column("email")
     private String email;
 

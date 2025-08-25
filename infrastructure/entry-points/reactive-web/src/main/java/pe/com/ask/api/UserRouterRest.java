@@ -14,9 +14,9 @@ import org.springframework.web.reactive.function.server.RouterFunction;
 import org.springframework.web.reactive.function.server.ServerResponse;
 import pe.com.ask.api.dto.request.SignInDTO;
 import pe.com.ask.api.dto.request.SignUpDTO;
+import pe.com.ask.api.dto.response.SignInResponse;
 import pe.com.ask.api.dto.response.SignUpResponse;
 import pe.com.ask.api.exception.GlobalExceptionFilter;
-import pe.com.ask.model.token.Token;
 
 import static org.springframework.web.reactive.function.server.RequestPredicates.POST;
 import static org.springframework.web.reactive.function.server.RouterFunctions.route;
@@ -83,7 +83,7 @@ public class UserRouterRest {
                                             description = "Login successful",
                                             content = @Content(
                                                     mediaType = "application/json",
-                                                    schema = @Schema(implementation = Token.class)
+                                                    schema = @Schema(implementation = SignInResponse.class)
                                             )
                                     ),
                                     @ApiResponse(
