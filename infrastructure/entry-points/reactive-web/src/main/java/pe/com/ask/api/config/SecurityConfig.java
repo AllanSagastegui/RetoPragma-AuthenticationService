@@ -13,7 +13,11 @@ public class SecurityConfig {
                 .authorizeExchange(auth -> auth
                         .pathMatchers(
                                 "/api/v1/usuarios",
-                                "/api/v1/login")
+                                "/api/v1/login",
+                                "/swagger-doc/**",
+                                "/v3/api-docs/**",
+                                "/webjars/**"
+                        )
                         .permitAll()
                         .anyExchange()
                         .authenticated())

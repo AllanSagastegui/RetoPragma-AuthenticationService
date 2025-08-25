@@ -8,6 +8,7 @@ import pe.com.ask.api.dto.request.SignUpDTO;
 import pe.com.ask.api.dto.request.SignInDTO;
 import pe.com.ask.api.exception.model.UnexpectedException;
 import pe.com.ask.api.exception.service.ValidationService;
+import pe.com.ask.api.mapper.TokenMapper;
 import pe.com.ask.api.mapper.UserMapper;
 import pe.com.ask.usecase.exception.BaseException;
 import pe.com.ask.usecase.signin.SignInUseCase;
@@ -19,7 +20,8 @@ import java.net.URI;
 @Component
 @RequiredArgsConstructor
 public class UserHandler {
-    private final UserMapper mapper;
+    private final UserMapper userMapper;
+    private final TokenMapper tokenMapper;
     private final ValidationService validationService;
 
     private final SignUpUseCase signUpUseCase;
@@ -28,9 +30,9 @@ public class UserHandler {
     public Mono<ServerResponse> listenPOSTSignUpUseCase(ServerRequest serverRequest) {
         return serverRequest.bodyToMono(SignUpDTO.class)
                 .flatMap(validationService::validate)
-                .map(mapper::toEntity)
+                .map(userMapper::toEntity)
                 .flatMap(signUpUseCase::signUpUser)
-                .map(mapper::toResponse)
+                .map(userMapper::toResponse)
                 .flatMap(response
                         -> ServerResponse.created(URI.create("/api/v1/usuarios/"))
                         .bodyValue(response))
@@ -43,6 +45,7 @@ public class UserHandler {
         return serverRequest.bodyToMono(SignInDTO.class)
                 .flatMap(validationService::validate)
                 .flatMap(dto -> signInUseCase.signInUser(dto.email(), dto.password()))
+                .map(tokenMapper::toResponse)
                 .flatMap(response
                         -> ServerResponse.ok()
                         .bodyValue(response))
@@ -50,4 +53,7 @@ public class UserHandler {
                         ex instanceof BaseException ? ex : new UnexpectedException(ex)
                 ));
     }
+
+    public void signUpDoc(SignUpDTO dto) {}
+    public void signInDoc(SignInDTO dto) {}
 }

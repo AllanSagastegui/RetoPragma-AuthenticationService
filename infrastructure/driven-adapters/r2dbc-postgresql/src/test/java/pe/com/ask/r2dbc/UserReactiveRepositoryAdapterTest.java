@@ -1,5 +1,6 @@
 package pe.com.ask.r2dbc;
 
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -13,13 +14,17 @@ import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
 
+import java.math.BigDecimal;
+import java.time.LocalDate;
+import java.util.UUID;
+
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 class UserReactiveRepositoryAdapterTest {
     // TODO: change four you own tests
-    /*
+
     @InjectMocks
     UserReactiveRepositoryAdapter repositoryAdapter;
 
@@ -29,75 +34,85 @@ class UserReactiveRepositoryAdapterTest {
     @Mock
     ObjectMapper mapper;
 
-    @Test
-    void mustFindValueById() {
-        UserEntity entity = new UserEntity();
-        entity.setId("1");
-        entity.setName("Test");
+    private User domain;
+    private UserEntity entity;
 
-        when(repository.findById("1")).thenReturn(Mono.just(entity));
-        when(mapper.map("test", Object.class)).thenReturn("test");
+    @BeforeEach
+    void setup() {
+        domain = User.builder()
+                .id(UUID.randomUUID())
+                .name("Test")
+                .lastName("User")
+                .email("test@example.com")
+                .password("password123")
+                .birthday(LocalDate.of(1990, 1, 1))
+                .address("123 Test St")
+                .phone("999999999")
+                .baseSalary(new BigDecimal("5000"))
+                .idRole(UUID.randomUUID())
+                .build();
 
-        Mono<User> result = repositoryAdapter.findById("1");
-
-        StepVerifier.create(result)
-                .expectNextMatches(value -> value.getId().equals("1") && value.getName().equals("Test"))
-                .verifyComplete();
+        entity = new UserEntity(
+                domain.getId(),
+                domain.getName(),
+                domain.getLastName(),
+                domain.getEmail(),
+                domain.getPassword(),
+                domain.getBirthday(),
+                domain.getAddress(),
+                domain.getPhone(),
+                domain.getBaseSalary(),
+                domain.getIdRole()
+        );
     }
 
     @Test
-    void mustFindAllValues() {
-        UserEntity entity = new UserEntity();
-        entity.setId("1");
-        entity.setName("Test");
-
-        User user = User.builder().id("1").name("Test").build();
-
-        when(repository.findAll()).thenReturn(Flux.just(entity));
-        when(mapper.map("test", Object.class)).thenReturn(user);
-
-        Flux<User> result = repositoryAdapter.findAll();
-
-        StepVerifier.create(result)
-                .expectNextMatches(value -> value.equals("test"))
-                .verifyComplete();
-    }
-
-    @Test
-    void mustFindByExample() {
-        UserEntity entity = new UserEntity();
-        entity.setId("1");
-        entity.setName("Test");
-
-        User user = User.builder().id("1").name("Test").build();
-
-        when(repository.findAll(any(Example.class))).thenReturn(Flux.just(entity));
-        when(mapper.map("test", Object.class)).thenReturn(user);
-
-        Flux<User> result = repositoryAdapter.findByExample(user);
-
-        StepVerifier.create(result)
-                .expectNextMatches(value -> value.equals("test"))
-                .verifyComplete();
-    }
-
-    @Test
-    void mustSaveValue() {
-        UserEntity entity = new UserEntity();
-        entity.setId("1");
-        entity.setName("Test");
-
-        User user = User.builder().id("1").name("Test").build();
-
+    void testSignUp() {
+        when(mapper.map(domain, UserEntity.class)).thenReturn(entity);
+        when(mapper.map(entity, User.class)).thenReturn(domain);
         when(repository.save(entity)).thenReturn(Mono.just(entity));
-        when(mapper.map("test", Object.class)).thenReturn("test");
 
-        Mono<User> result = repositoryAdapter.save(user);
+        System.out.println("=== Starting testSignUp ===");
+        System.out.println("Domain user before save: " + domain);
 
-        StepVerifier.create(result)
-                .expectNextMatches(value -> value.equals("test"))
+        StepVerifier.create(
+                        repositoryAdapter.signUp(domain)
+                                .doOnNext(result -> System.out.println("Result from signUp: " + result))
+                )
+                .expectNextMatches(result ->
+                        result.getId().equals(domain.getId()) &&
+                                result.getEmail().equals(domain.getEmail()) &&
+                                result.getName().equals(domain.getName()) &&
+                                result.getLastName().equals(domain.getLastName()) &&
+                                result.getPassword().equals(domain.getPassword()) &&
+                                result.getBirthday().equals(domain.getBirthday()) &&
+                                result.getAddress().equals(domain.getAddress()) &&
+                                result.getPhone().equals(domain.getPhone()) &&
+                                result.getBaseSalary().equals(domain.getBaseSalary()) &&
+                                result.getIdRole().equals(domain.getIdRole())
+                )
+                .verifyComplete();
+
+        System.out.println("=== Finished testSignUp ===");
+    }
+
+    @Test
+    void testExistsByEmail() {
+        when(repository.existsByEmail("test@example.com")).thenReturn(Mono.just(true));
+
+        StepVerifier.create(repositoryAdapter.existsByEmail("test@example.com")
+                        .doOnNext(exists -> System.out.println("ExistsByEmail: " + exists)))
+                .expectNext(true)
                 .verifyComplete();
     }
 
-     */
+    @Test
+    void testFindByEmail() {
+        when(repository.findByEmail("test@example.com")).thenReturn(Mono.just(domain));
+
+        StepVerifier.create(repositoryAdapter.findByEmail("test@example.com")
+                        .doOnNext(result -> System.out.println("FindByEmail result: " + result)))
+                .expectNextMatches(user -> user.getEmail().equals(domain.getEmail()))
+                .verifyComplete();
+    }
 }

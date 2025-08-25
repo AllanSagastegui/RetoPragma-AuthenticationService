@@ -31,14 +31,14 @@ public enum ErrorCatalog {
             Map.of("email", "This email is already in use")
     ),
     VALIDATION_EXCEPTION(
-            "VALIDATION_EXCEPTION",
+            "AUTH_VALIDATION_EXCEPTION",
             "Validation Failed",
             "Oops! Some of the data you sent doesn’t look right. Please review the fields and try again.",
             400,
             null
     ),
     INTERNAL_SERVER_ERROR(
-            "INTERNAL_SERVER_ERROR",
+            "AUTH_INTERNAL_SERVER_ERROR",
             "Internal Server Error",
             "Something went wrong on our side. Please try again later or contact support if the issue persists.",
             500,
