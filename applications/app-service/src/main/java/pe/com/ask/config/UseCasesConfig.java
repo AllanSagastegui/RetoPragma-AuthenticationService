@@ -34,9 +34,8 @@ public class UseCasesConfig {
     SignInUseCase signInUseCase(
             UserRepository userRepository,
             TokenRepository tokenRepository,
-            PasswordHasher passwordHasher,
-            TransactionalGateway transactionalGateway
+            PasswordHasher passwordHasher
     ) {
-        return new SignInUseCase(userRepository, tokenRepository, passwordHasher, transactionalGateway);
+        return new SignInUseCase(userRepository, tokenRepository, passwordHasher);
     }
 }

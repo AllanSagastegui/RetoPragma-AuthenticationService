@@ -24,12 +24,6 @@ public enum ErrorCatalog {
             "User already exists",
             "User with the provided email already exists",
             409
-    ),
-    USER_NOT_FOUND(
-            "AUTH-USER-NOT-FOUND",
-                    "User Not Found",
-                    "The specified user does not exist",
-                    404
     );
 
 
