@@ -9,7 +9,7 @@ import org.springframework.data.relational.core.mapping.Column;
 import org.springframework.data.relational.core.mapping.Table;
 
 import java.math.BigDecimal;
-import java.util.Date;
+import java.time.LocalDate;
 import java.util.UUID;
 
 @NoArgsConstructor
@@ -35,7 +35,7 @@ public class UserEntity {
     private String password;
 
     @Column("birthday")
-    private Date birthday;
+    private LocalDate birthday;
 
     @Column("address")
     private String address;

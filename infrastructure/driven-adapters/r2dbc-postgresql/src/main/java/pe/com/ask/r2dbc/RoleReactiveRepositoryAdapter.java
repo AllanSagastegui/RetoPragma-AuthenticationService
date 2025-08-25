@@ -30,4 +30,9 @@ public class RoleReactiveRepositoryAdapter extends ReactiveAdapterOperations<
     public Mono<Role> findByName(String name){
         return super.repository.findByName(name);
     }
+
+    @Override
+    public Mono<Role> findById(UUID id){
+        return super.findById(id);
+    }
 }

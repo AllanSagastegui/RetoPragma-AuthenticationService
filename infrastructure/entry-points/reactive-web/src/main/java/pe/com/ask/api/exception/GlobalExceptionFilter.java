@@ -13,7 +13,7 @@ import pe.com.ask.usecase.exception.RoleNotFoundException;
 import pe.com.ask.usecase.exception.UserAlreadyExistsException;
 import reactor.core.publisher.Mono;
 
-import java.time.LocalDateTime;
+import java.util.Date;
 
 @Component
 @RequiredArgsConstructor
@@ -31,7 +31,7 @@ public class GlobalExceptionFilter implements HandlerFilterFunction<ServerRespon
                                         .message(ex.getMessage())
                                         .errors(ex.getErrors())
                                         .status(400)
-                                        .timestamp(LocalDateTime.now())
+                                        .timestamp(new Date())
                                         .build()
                         )
                 )
@@ -42,7 +42,7 @@ public class GlobalExceptionFilter implements HandlerFilterFunction<ServerRespon
                                         .message(ex.getMessage())
                                         .errors(null)
                                         .status(409)
-                                        .timestamp(LocalDateTime.now())
+                                        .timestamp(new Date())
                                         .build()
                         )
                 )
@@ -53,7 +53,7 @@ public class GlobalExceptionFilter implements HandlerFilterFunction<ServerRespon
                                         .message(ex.getMessage())
                                         .errors(null)
                                         .status(404)
-                                        .timestamp(LocalDateTime.now())
+                                        .timestamp(new Date())
                                         .build()
                         )
                 )
@@ -64,7 +64,7 @@ public class GlobalExceptionFilter implements HandlerFilterFunction<ServerRespon
                                         .message(ex.getMessage())
                                         .errors(null)
                                         .status(500)
-                                        .timestamp(LocalDateTime.now())
+                                        .timestamp(new Date())
                                         .build()
                         )
                 );

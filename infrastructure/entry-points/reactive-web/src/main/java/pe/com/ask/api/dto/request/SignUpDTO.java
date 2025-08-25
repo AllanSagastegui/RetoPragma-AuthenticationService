@@ -3,6 +3,7 @@ package pe.com.ask.api.dto.request;
 import jakarta.validation.constraints.*;
 
 import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.util.Date;
 import java.util.UUID;
 
@@ -21,7 +22,7 @@ public record SignUpDTO(
 
         @NotBlank(message = "Password cannot be blank")
         String password,
-        Date birthday,
+        LocalDate birthday,
         String address,
         String phone,
 
