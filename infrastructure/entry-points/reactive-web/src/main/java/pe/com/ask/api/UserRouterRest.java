@@ -15,6 +15,6 @@ public class UserRouterRest {
     public RouterFunction<ServerResponse> userRouterFunction(UserHandler userHandler, GlobalExceptionFilter filter) {
         return route(POST("/api/v1/usuarios"), userHandler::listenPOSTSignUpUseCase)
                 .andRoute(POST("/api/v1/login"), userHandler::listenPOSTSignInUseCase)
-                /*.filter(filter)*/;
+                .filter(filter);
     }
 }
