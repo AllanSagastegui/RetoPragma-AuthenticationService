@@ -7,6 +7,8 @@ import pe.com.ask.model.token.gateways.TokenRepository;
 import pe.com.ask.model.user.User;
 import pe.com.ask.model.user.gateways.PasswordHasher;
 import pe.com.ask.model.user.gateways.UserRepository;
+import pe.com.ask.usecase.exception.InvalidCredentialsException;
+import pe.com.ask.usecase.exception.UserNotFoundException;
 import reactor.core.publisher.Mono;
 
 @RequiredArgsConstructor
@@ -19,7 +21,7 @@ public class SignInUseCase {
     public Mono<Token> signInUser(String email, String password){
         return transactionalGateway.executeInTransaction(
             userRepository.findByEmail(email)
-                    .switchIfEmpty(Mono.error(new RuntimeException()))
+                    .switchIfEmpty(Mono.error(new UserNotFoundException()))
                     .flatMap(user -> validatePassword(user, password))
                     .flatMap(tokenRepository::generateAccessToken)
         );
@@ -28,6 +30,6 @@ public class SignInUseCase {
     private Mono<User> validatePassword(User user, String rawPassword){
         return passwordHasher.matches(rawPassword, user.getPassword())
                 ? Mono.just(user)
-                : Mono.error(new RuntimeException());
+                : Mono.error(new InvalidCredentialsException());
     }
 }
