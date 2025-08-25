@@ -1,11 +1,14 @@
 package pe.com.ask.usecase.exception;
 
+import pe.com.ask.usecase.utils.ErrorCatalog;
+
 public class UserAlreadyExistsException extends BaseException {
-    public UserAlreadyExistsException(String email) {
+    public UserAlreadyExistsException() {
         super(
-                "User already exists",
-                "User with email " + email + " already exists",
-                409
+                ErrorCatalog.USER_ALREADY_EXISTS.getErrorCode(),
+                ErrorCatalog.USER_ALREADY_EXISTS.getTitle(),
+                ErrorCatalog.USER_ALREADY_EXISTS.getMessage(),
+                ErrorCatalog.USER_ALREADY_EXISTS.getStatus()
         );
     }
 }

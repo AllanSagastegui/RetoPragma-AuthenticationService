@@ -22,7 +22,7 @@ public class SignUpUseCase {
         return transactionalGateway.executeInTransaction(
                 userRepository.existsByEmail(user.getEmail())
                         .flatMap(exists -> exists
-                                ? Mono.error(new UserAlreadyExistsException(user.getEmail()))
+                                ? Mono.error(new UserAlreadyExistsException())
                                 : roleRepository.findByName("CLIENT")
                                 .switchIfEmpty(Mono.error(new RoleNotFoundException()))
                                 .flatMap(role -> {

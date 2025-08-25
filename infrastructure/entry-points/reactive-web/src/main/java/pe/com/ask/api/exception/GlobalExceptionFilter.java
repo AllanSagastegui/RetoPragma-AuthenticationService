@@ -10,13 +10,9 @@ import org.springframework.web.reactive.function.server.ServerResponse;
 import pe.com.ask.api.exception.model.ErrorResponse;
 import pe.com.ask.api.exception.model.ValidationException;
 import pe.com.ask.usecase.exception.BaseException;
-import pe.com.ask.usecase.exception.RoleNotFoundException;
-import pe.com.ask.usecase.exception.UserAlreadyExistsException;
 import reactor.core.publisher.Mono;
 
-import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.util.Date;
 
 @Component
 @RequiredArgsConstructor
@@ -30,6 +26,7 @@ public class GlobalExceptionFilter implements HandlerFilterFunction<ServerRespon
                 .onErrorResume(ValidationException.class, ex ->
                         ServerResponse.badRequest().bodyValue(
                                 ErrorResponse.builder()
+                                        .errorCode("AUTH-VALIDATION-ERROR")
                                         .tittle("Validation failed")
                                         .message(ex.getMessage())
                                         .errors(ex.getErrors())
@@ -41,6 +38,7 @@ public class GlobalExceptionFilter implements HandlerFilterFunction<ServerRespon
                 .onErrorResume(BaseException.class, ex ->
                         ServerResponse.status(ex.getStatus()).bodyValue(
                                 ErrorResponse.builder()
+                                        .errorCode(ex.getErrorCode())
                                         .tittle(ex.getTitle())
                                         .message(ex.getMessage())
                                         .errors(null)
@@ -52,6 +50,7 @@ public class GlobalExceptionFilter implements HandlerFilterFunction<ServerRespon
                 .onErrorResume(ex ->
                         ServerResponse.status(500).bodyValue(
                                 ErrorResponse.builder()
+                                        .errorCode("INTERNAL_SERVER_ERROR")
                                         .tittle("Unexpected Error")
                                         .message(ex.getMessage())
                                         .errors(null)

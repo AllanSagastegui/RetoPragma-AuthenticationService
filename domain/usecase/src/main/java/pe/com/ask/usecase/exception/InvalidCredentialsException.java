@@ -1,11 +1,14 @@
 package pe.com.ask.usecase.exception;
 
+import pe.com.ask.usecase.utils.ErrorCatalog;
+
 public class InvalidCredentialsException extends BaseException {
     public InvalidCredentialsException() {
         super(
-                "Invalid Credentials",
-                "The provided credentials are incorrect",
-                401
+                ErrorCatalog.INVALID_CREDENTIALS.getErrorCode(),
+                ErrorCatalog.INVALID_CREDENTIALS.getTitle(),
+                ErrorCatalog.INVALID_CREDENTIALS.getMessage(),
+                ErrorCatalog.INVALID_CREDENTIALS.getStatus()
         );
     }
 }
