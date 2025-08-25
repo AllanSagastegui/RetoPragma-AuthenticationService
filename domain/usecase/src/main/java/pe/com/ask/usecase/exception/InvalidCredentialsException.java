@@ -8,7 +8,8 @@ public class InvalidCredentialsException extends BaseException {
                 ErrorCatalog.INVALID_CREDENTIALS.getErrorCode(),
                 ErrorCatalog.INVALID_CREDENTIALS.getTitle(),
                 ErrorCatalog.INVALID_CREDENTIALS.getMessage(),
-                ErrorCatalog.INVALID_CREDENTIALS.getStatus()
+                ErrorCatalog.INVALID_CREDENTIALS.getStatus(),
+                ErrorCatalog.INVALID_CREDENTIALS.getErrors()
         );
     }
 }

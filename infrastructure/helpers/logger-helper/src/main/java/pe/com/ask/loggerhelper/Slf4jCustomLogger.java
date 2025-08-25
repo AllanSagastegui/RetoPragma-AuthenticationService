@@ -3,12 +3,12 @@ package pe.com.ask.loggerhelper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
-import pe.com.ask.model.gateways.UseCaseLogger;
+import pe.com.ask.model.gateways.CustomLogger;
 
 @Component
-public class Slf4jUseCaseLogger implements UseCaseLogger {
+public class Slf4jCustomLogger implements CustomLogger {
 
-    private static final Logger log =  LoggerFactory.getLogger(Slf4jUseCaseLogger.class);
+    private static final Logger log =  LoggerFactory.getLogger(Slf4jCustomLogger.class);
 
     @Override
     public void trace(String message, Object... args) {

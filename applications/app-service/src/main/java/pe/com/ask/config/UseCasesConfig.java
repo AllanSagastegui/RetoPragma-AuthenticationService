@@ -4,7 +4,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.FilterType;
-import pe.com.ask.model.gateways.UseCaseLogger;
+import pe.com.ask.model.gateways.CustomLogger;
 import pe.com.ask.model.role.gateways.RoleRepository;
 import pe.com.ask.model.token.gateways.TokenRepository;
 import pe.com.ask.model.user.gateways.PasswordHasher;
@@ -27,9 +27,9 @@ public class UseCasesConfig {
             RoleRepository roleRepository,
             PasswordHasher passwordHasher,
             TransactionalGateway transactionalGateway,
-            UseCaseLogger useCaseLogger
+            CustomLogger customLogger
     ) {
-        return new SignUpUseCase(userRepository, roleRepository, passwordHasher, transactionalGateway, useCaseLogger);
+        return new SignUpUseCase(userRepository, roleRepository, passwordHasher, transactionalGateway, customLogger);
     }
 
     @Bean
@@ -37,8 +37,8 @@ public class UseCasesConfig {
             UserRepository userRepository,
             TokenRepository tokenRepository,
             PasswordHasher passwordHasher,
-            UseCaseLogger useCaseLogger
+            CustomLogger customLogger
     ) {
-        return new SignInUseCase(userRepository, tokenRepository, passwordHasher, useCaseLogger);
+        return new SignInUseCase(userRepository, tokenRepository, passwordHasher, customLogger);
     }
 }

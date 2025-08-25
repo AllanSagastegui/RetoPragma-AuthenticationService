@@ -8,7 +8,8 @@ public class UserAlreadyExistsException extends BaseException {
                 ErrorCatalog.USER_ALREADY_EXISTS.getErrorCode(),
                 ErrorCatalog.USER_ALREADY_EXISTS.getTitle(),
                 ErrorCatalog.USER_ALREADY_EXISTS.getMessage(),
-                ErrorCatalog.USER_ALREADY_EXISTS.getStatus()
+                ErrorCatalog.USER_ALREADY_EXISTS.getStatus(),
+                ErrorCatalog.USER_ALREADY_EXISTS.getErrors()
         );
     }
 }

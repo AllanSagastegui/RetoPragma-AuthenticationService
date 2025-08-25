@@ -2,7 +2,7 @@ package pe.com.ask.usecase.signup;
 
 import lombok.RequiredArgsConstructor;
 import pe.com.ask.model.gateways.TransactionalGateway;
-import pe.com.ask.model.gateways.UseCaseLogger;
+import pe.com.ask.model.gateways.CustomLogger;
 import pe.com.ask.model.role.gateways.RoleRepository;
 import pe.com.ask.model.user.User;
 import pe.com.ask.model.user.gateways.PasswordHasher;
@@ -18,33 +18,33 @@ public class SignUpUseCase {
     private final RoleRepository roleRepository;
     private final PasswordHasher passwordHasher;
     private final TransactionalGateway transactionalGateway;
-    private final UseCaseLogger useCaseLogger;
+    private final CustomLogger customLogger;
 
     public Mono<User> signUpUser(User user){
-        useCaseLogger.trace("Start sign-up User flow for email: {}", user.getEmail());
+        customLogger.trace("Start sign-up User flow for email: {}", user.getEmail());
         return transactionalGateway.executeInTransaction(
                 userRepository.existsByEmail(user.getEmail())
-                        .doOnSubscribe(sub -> useCaseLogger.trace("Subscribed to check if email exists: {}", user.getEmail()))
+                        .doOnSubscribe(sub -> customLogger.trace("Subscribed to check if email exists: {}", user.getEmail()))
                         .flatMap(exists -> {
                             if (exists) {
-                                useCaseLogger.trace("User already exists with email: {}", user.getEmail());
+                                customLogger.trace("User already exists with email: {}", user.getEmail());
                                 return Mono.error(new UserAlreadyExistsException());
                             }
-                            useCaseLogger.trace("User does not exist, searching for CLIENT role");
+                            customLogger.trace("User does not exist, searching for CLIENT role");
                             return roleRepository.findByName("CLIENT")
-                                    .doOnNext(role -> useCaseLogger.trace("Role CLIENT found with id: {}", role.getId()))
+                                    .doOnNext(role -> customLogger.trace("Role CLIENT found with id: {}", role.getId()))
                                     .switchIfEmpty(Mono.defer(() -> {
-                                        useCaseLogger.trace("Role CLIENT not found");
+                                        customLogger.trace("Role CLIENT not found");
                                         return Mono.error(new RoleNotFoundException());
                                     }))
                                     .flatMap(role -> {
                                         user.setPassword(passwordHasher.hash(user.getPassword()));
-                                        useCaseLogger.trace("Password hashed for user: {}", user.getEmail());
+                                        customLogger.trace("Password hashed for user: {}", user.getEmail());
                                         user.setIdRole(role.getId());
                                         return userRepository.signUp(user)
-                                                .doOnSuccess(u -> useCaseLogger.trace("User signed up successfully: {}", u.getEmail()));
+                                                .doOnSuccess(u -> customLogger.trace("User signed up successfully: {}", u.getEmail()));
                                     });
                         })
-        ).doOnError(err -> useCaseLogger.trace("Sign-up error for {}: {}", user.getEmail(), err.getMessage()));
+        ).doOnError(err -> customLogger.trace("Sign-up error for {}: {}", user.getEmail(), err.getMessage()));
     }
 }
