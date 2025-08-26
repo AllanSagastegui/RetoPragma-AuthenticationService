@@ -7,4 +7,3 @@ dependencies {
 
     testImplementation 'org.reactivecommons.utils:object-mapper:0.1.0'
 }
-

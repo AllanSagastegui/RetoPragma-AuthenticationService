@@ -27,8 +27,9 @@ public class RoleReactiveRepositoryAdapter extends ReactiveAdapterOperations<
     }
 
     @Override
-    public Mono<Role> findByName(String name){
-        return super.repository.findByName(name);
+    public Mono<Role> findByName(String name) {
+        return super.repository.findByName(name)
+                .map(entity -> mapper.map(entity, Role.class));
     }
 
     @Override

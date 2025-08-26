@@ -16,7 +16,8 @@ public class SecurityConfig {
                                 "/api/v1/login",
                                 "/swagger-doc/**",
                                 "/v3/api-docs/**",
-                                "/webjars/**"
+                                "/webjars/**",
+                                "/test"
                         )
                         .permitAll()
                         .anyExchange()

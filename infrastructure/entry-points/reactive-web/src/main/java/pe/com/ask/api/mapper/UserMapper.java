@@ -5,10 +5,25 @@ import pe.com.ask.api.dto.request.SignUpDTO;
 import pe.com.ask.api.dto.response.SignUpResponse;
 import pe.com.ask.model.user.User;
 
+import java.time.LocalDate;
+
 @Mapper(componentModel = "spring")
 public interface UserMapper {
-    SignUpDTO toDTO(User user);
-    User toEntity(SignUpDTO dto);
+    default User toEntity(SignUpDTO dto){
+        if(dto == null) return null;
+        return User.builder()
+                .name(dto.name())
+                .lastName(dto.lastName())
+                .dni(dto.dni())
+                .email(dto.email())
+                .password(dto.password())
+                .birthday(LocalDate.parse(dto.birthday()))
+                .address(dto.address())
+                .phone(dto.phone())
+                .baseSalary(dto.baseSalary())
+                .build();
+    }
+
     default SignUpResponse toResponse(User user) {
         if (user == null) return null;
         return new SignUpResponse(
@@ -16,7 +31,7 @@ public interface UserMapper {
                 user.getLastName(),
                 user.getDni(),
                 user.getEmail(),
-                user.getBirthday(),
+                user.getBirthday().toString(),
                 user.getAddress(),
                 user.getPhone(),
                 user.getBaseSalary()

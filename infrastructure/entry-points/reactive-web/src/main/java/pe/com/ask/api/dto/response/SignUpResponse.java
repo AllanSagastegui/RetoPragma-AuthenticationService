@@ -3,7 +3,6 @@ package pe.com.ask.api.dto.response;
 import io.swagger.v3.oas.annotations.media.Schema;
 
 import java.math.BigDecimal;
-import java.time.LocalDate;
 
 @Schema(name = "SignUpResponse", description = "Response after user registration")
 public record SignUpResponse(
@@ -21,7 +20,7 @@ public record SignUpResponse(
         String email,
 
         @Schema(description = "User's birthday", example = "2003-03-11")
-        LocalDate birthday,
+        String birthday,
 
         @Schema(description = "User's address", example = "Mi Casa, Lima, Peru")
         String address,
