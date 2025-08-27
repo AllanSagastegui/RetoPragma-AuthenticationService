@@ -1,12 +1,11 @@
 package pe.com.ask.usecase.signin;
 
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
-import org.mockito.MockitoAnnotations;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import pe.com.ask.model.gateways.CustomLogger;
 import pe.com.ask.model.token.Token;
 import pe.com.ask.model.token.gateways.TokenRepository;
@@ -59,6 +58,7 @@ class SignInUseCaseTest {
     }
 
     @Test
+    @DisplayName("Should sign in successfully when user exists and password is valid")
     void signInUserSuccess() {
         when(userRepository.findByEmail(email)).thenReturn(Mono.just(testUser));
         when(passwordHasher.matches(password, testUser.getPassword())).thenReturn(true);
@@ -70,6 +70,7 @@ class SignInUseCaseTest {
     }
 
     @Test
+    @DisplayName("Should throw InvalidCredentialsException when user is not found")
     void signInUserUserNotFound() {
         when(userRepository.findByEmail(email)).thenReturn(Mono.empty());
 
@@ -79,6 +80,7 @@ class SignInUseCaseTest {
     }
 
     @Test
+    @DisplayName("Should throw InvalidCredentialsException when password is invalid")
     void signInUserInvalidPassword() {
         when(userRepository.findByEmail(email)).thenReturn(Mono.just(testUser));
         when(passwordHasher.matches(password, testUser.getPassword())).thenReturn(false);

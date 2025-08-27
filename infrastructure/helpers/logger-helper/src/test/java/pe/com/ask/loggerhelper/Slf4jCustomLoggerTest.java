@@ -3,6 +3,7 @@ package pe.com.ask.loggerhelper;
 import com.github.valfirst.slf4jtest.TestLogger;
 import com.github.valfirst.slf4jtest.TestLoggerFactory;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -20,6 +21,7 @@ class Slf4jCustomLoggerTest {
     }
 
     @Test
+    @DisplayName("Should log a TRACE message correctly")
     void testTrace() {
         customLogger.trace("trace message {}", 123);
         assertThat(testLogger.getLoggingEvents())
@@ -29,6 +31,7 @@ class Slf4jCustomLoggerTest {
     }
 
     @Test
+    @DisplayName("Should log an INFO message correctly")
     void testInfo() {
         customLogger.info("info message {}", "arg");
         assertThat(testLogger.getLoggingEvents())
@@ -38,6 +41,7 @@ class Slf4jCustomLoggerTest {
     }
 
     @Test
+    @DisplayName("Should log a WARN message correctly")
     void testWarn() {
         customLogger.warn("warn message {}", true);
         assertThat(testLogger.getLoggingEvents())
@@ -47,6 +51,7 @@ class Slf4jCustomLoggerTest {
     }
 
     @Test
+    @DisplayName("Should log an ERROR message correctly")
     void testError() {
         customLogger.error("error message {}", "error");
         assertThat(testLogger.getLoggingEvents())

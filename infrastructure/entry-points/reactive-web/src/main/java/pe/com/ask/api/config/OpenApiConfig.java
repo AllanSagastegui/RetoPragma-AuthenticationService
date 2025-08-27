@@ -6,9 +6,9 @@ import org.springframework.context.annotation.Configuration;
 
 @Configuration
 @OpenAPIDefinition(info = @Info(
-        title = "Authentication-Service",
+        title = "Authentication Service API",
         version = "1.0",
-        description = "Servicio de Atuh para Crediya"
+        description = "This service provides secure authentication and authorization mechanisms for Crediya."
 ))
 public class OpenApiConfig {
 }

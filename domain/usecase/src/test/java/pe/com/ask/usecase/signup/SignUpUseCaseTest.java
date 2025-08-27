@@ -1,6 +1,7 @@
 package pe.com.ask.usecase.signup;
 
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
@@ -26,7 +27,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
-public class SignUpUseCaseTest {
+class SignUpUseCaseTest {
     @Mock private UserRepository userRepository;
     @Mock
     private RoleRepository roleRepository;
@@ -63,6 +64,7 @@ public class SignUpUseCaseTest {
     }
 
     @Test
+    @DisplayName("Should sign up user successfully when email and DNI are unique and role exists")
     void signUpUserSuccess() {
         when(userRepository.findByEmail(testUser.getEmail())).thenReturn(Mono.empty());
         when(userRepository.findByDni(testUser.getDni())).thenReturn(Mono.empty());
@@ -81,6 +83,7 @@ public class SignUpUseCaseTest {
     }
 
     @Test
+    @DisplayName("Should throw UserAlreadyExistsException when email already exists")
     void signUpUserEmailExists() {
         when(userRepository.findByEmail(testUser.getEmail())).thenReturn(Mono.just(testUser));
         when(roleRepository.findByName(DEFAULT_ROLE.CLIENT.toString())).thenReturn(Mono.empty());
@@ -94,6 +97,7 @@ public class SignUpUseCaseTest {
     }
 
     @Test
+    @DisplayName("Should throw UserAlreadyExistsException when DNI already exists")
     void signUpUserDniExists() {
         when(userRepository.findByEmail(testUser.getEmail())).thenReturn(Mono.empty());
         when(userRepository.findByDni(testUser.getDni())).thenReturn(Mono.just(testUser));
@@ -108,6 +112,7 @@ public class SignUpUseCaseTest {
     }
 
     @Test
+    @DisplayName("Should throw RoleNotFoundException when default role CLIENT is not found")
     void signUpUserRoleNotFound() {
         when(userRepository.findByEmail(testUser.getEmail())).thenReturn(Mono.empty());
         when(userRepository.findByDni(testUser.getDni())).thenReturn(Mono.empty());

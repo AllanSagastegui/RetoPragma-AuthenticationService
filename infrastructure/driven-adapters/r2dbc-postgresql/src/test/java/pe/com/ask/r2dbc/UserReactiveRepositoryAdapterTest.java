@@ -1,6 +1,7 @@
 package pe.com.ask.r2dbc;
 
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -66,6 +67,7 @@ class UserReactiveRepositoryAdapterTest {
     }
 
     @Test
+    @DisplayName("Should sign up user successfully")
     void testSignUp() {
         when(mapper.map(domain, UserEntity.class)).thenReturn(entity);
         when(mapper.map(entity, User.class)).thenReturn(domain);
@@ -79,6 +81,7 @@ class UserReactiveRepositoryAdapterTest {
     }
 
     @Test
+    @DisplayName("Should fail to sign up user when repository throws error")
     void testSignUpShouldFail() {
         when(mapper.map(domain, UserEntity.class)).thenReturn(entity);
         when(repository.save(entity)).thenReturn(Mono.error(new RuntimeException("Error registering user")));
@@ -89,6 +92,7 @@ class UserReactiveRepositoryAdapterTest {
     }
 
     @Test
+    @DisplayName("Should fail to sign up user when entity is empty")
     void testSignUpShouldFailWithEmptyValue() {
         when(mapper.map(domain, UserEntity.class)).thenReturn(entity);
         when(repository.save(entity)).thenReturn(Mono.error(new RuntimeException("Entity is empty")));
@@ -99,6 +103,7 @@ class UserReactiveRepositoryAdapterTest {
     }
 
     @Test
+    @DisplayName("Should fail to sign up user when entity is null")
     void testSignUpShouldFailWithNull() {
         when(mapper.map(domain, UserEntity.class)).thenReturn(null);
         when(repository.save(null)).thenReturn(Mono.error(new RuntimeException("Entity is null")));
@@ -109,6 +114,7 @@ class UserReactiveRepositoryAdapterTest {
     }
 
     @Test
+    @DisplayName("Should find user by email successfully")
     void testFindByEmail() {
         when(repository.findByEmail("test@example.com")).thenReturn(Mono.just(entity));
         when(mapper.map(entity, User.class)).thenReturn(domain);
@@ -119,6 +125,7 @@ class UserReactiveRepositoryAdapterTest {
     }
 
     @Test
+    @DisplayName("Should fail to find user by email when not found")
     void testFindByEmailShouldFail() {
         when(repository.findByEmail("wrong@example.com")).thenReturn(Mono.error(new RuntimeException("User not found")));
 
@@ -128,6 +135,7 @@ class UserReactiveRepositoryAdapterTest {
     }
 
     @Test
+    @DisplayName("Should return empty when user email does not exist")
     void testFindByEmailShouldFailWithEmptyValue() {
         when(repository.findByEmail("empty@example.com")).thenReturn(Mono.empty());
 
@@ -137,6 +145,7 @@ class UserReactiveRepositoryAdapterTest {
     }
 
     @Test
+    @DisplayName("Should fail to find user by email when email is null")
     void testFindByEmailShouldFailWithNull() {
         when(repository.findByEmail(isNull())).thenReturn(Mono.error(new RuntimeException("Email is null")));
 
@@ -146,6 +155,7 @@ class UserReactiveRepositoryAdapterTest {
     }
 
     @Test
+    @DisplayName("Should find user by DNI successfully")
     void testFindByDni() {
         when(repository.findByDni("12345678")).thenReturn(Mono.just(entity));
         when(mapper.map(entity, User.class)).thenReturn(domain);
@@ -156,6 +166,7 @@ class UserReactiveRepositoryAdapterTest {
     }
 
     @Test
+    @DisplayName("Should fail to find user by DNI when not found")
     void testFindByDniShouldFail() {
         when(repository.findByDni("87654321")).thenReturn(Mono.error(new RuntimeException("User not found")));
 
@@ -165,6 +176,7 @@ class UserReactiveRepositoryAdapterTest {
     }
 
     @Test
+    @DisplayName("Should return empty when user DNI does not exist")
     void testFindByDniShouldFailWithEmptyValue() {
         when(repository.findByDni("")).thenReturn(Mono.empty());
 
@@ -174,6 +186,7 @@ class UserReactiveRepositoryAdapterTest {
     }
 
     @Test
+    @DisplayName("Should fail to find user by DNI when DNI is null")
     void testFindByDniShouldFailWithNull() {
         when(repository.findByDni(isNull())).thenReturn(Mono.error(new RuntimeException("DNI is null")));
 

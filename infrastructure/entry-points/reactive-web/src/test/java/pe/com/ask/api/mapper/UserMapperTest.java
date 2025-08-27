@@ -1,5 +1,6 @@
 package pe.com.ask.api.mapper;
 
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.mapstruct.factory.Mappers;
 import pe.com.ask.api.dto.request.SignUpDTO;
@@ -16,6 +17,7 @@ class UserMapperTest {
     private final UserMapper mapper = Mappers.getMapper(UserMapper.class);
 
     @Test
+    @DisplayName("Should map SignUpDTO to User entity correctly")
     void testToEntity() {
         SignUpDTO dto = new SignUpDTO(
                 "Allan",
@@ -44,6 +46,7 @@ class UserMapperTest {
     }
 
     @Test
+    @DisplayName("Should map User entity to SignUpResponse correctly")
     void testToResponse() {
         User user = User.builder()
                 .name("Allan")
@@ -71,6 +74,7 @@ class UserMapperTest {
     }
 
     @Test
+    @DisplayName("Should return null when mapping null values")
     void testNullHandling() {
         assertNull(mapper.toEntity(null));
         assertNull(mapper.toResponse(null));

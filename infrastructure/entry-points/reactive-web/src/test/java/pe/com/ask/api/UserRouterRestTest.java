@@ -2,6 +2,7 @@ package pe.com.ask.api;
 
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,7 +16,6 @@ import pe.com.ask.api.dto.request.SignUpDTO;
 import pe.com.ask.api.dto.response.SignInResponse;
 import pe.com.ask.api.dto.response.SignUpResponse;
 import pe.com.ask.api.exception.GlobalExceptionFilter;
-import pe.com.ask.api.exception.model.UnexpectedException;
 import pe.com.ask.api.exception.model.ValidationException;
 import pe.com.ask.api.exception.service.ValidationService;
 import pe.com.ask.api.mapper.TokenMapper;
@@ -56,15 +56,11 @@ class UserRouterRestTest {
     private SignUpDTO signUpDTO;
     private SignInDTO signInDTO;
 
-    private SignUpResponse signUpResponse;
-    private SignInResponse signInResponse;
-
-    private User userEntity;
     private Token tokenEntity;
 
     @BeforeEach
     void setUp() {
-        userEntity = new User();
+        User userEntity = new User();
         userEntity.setId(UUID.randomUUID());
         userEntity.setName("Allan");
         userEntity.setLastName("Sagastegui");
@@ -93,7 +89,7 @@ class UserRouterRestTest {
 
         signInDTO = new SignInDTO(userEntity.getEmail(), userEntity.getPassword());
 
-        signUpResponse = new SignUpResponse(
+        SignUpResponse signUpResponse = new SignUpResponse(
                 userEntity.getName(),
                 userEntity.getLastName(),
                 userEntity.getDni(),
@@ -104,7 +100,7 @@ class UserRouterRestTest {
                 userEntity.getBaseSalary()
         );
 
-        signInResponse = new SignInResponse(tokenEntity.getToken());
+        SignInResponse signInResponse = new SignInResponse(tokenEntity.getToken());
 
         Mockito.when(validationService.validate(any(SignUpDTO.class)))
                 .thenReturn(Mono.just(signUpDTO));
@@ -131,6 +127,7 @@ class UserRouterRestTest {
     }
 
     @Test
+    @DisplayName("Should return 201 Created when sign-up request is successful")
     void testSignUpEndpointSuccess() {
         webTestClient.post()
                 .uri("/api/v1/usuarios")
@@ -146,6 +143,7 @@ class UserRouterRestTest {
     }
 
     @Test
+    @DisplayName("Should return 200 OK when sign-in request is successful")
     void testSignInEndpointSuccess() {
         webTestClient.post()
                 .uri("/api/v1/login")
@@ -158,6 +156,7 @@ class UserRouterRestTest {
     }
 
     @Test
+    @DisplayName("Should return validation error when sign-up request fails validation")
     void testSignUpEndpointValidationFailure() {
         ValidationException validationException = new ValidationException(Map.of(
                 "email", "Email is required"
@@ -177,6 +176,7 @@ class UserRouterRestTest {
     }
 
     @Test
+    @DisplayName("Should return validation error when sign-in request fails validation")
     void testSignInEndpointValidationFailure() {
         Mockito.when(validationService.validate(any(SignInDTO.class)))
                 .thenReturn(Mono.error(new RuntimeException("Validation failed")));
@@ -192,6 +192,7 @@ class UserRouterRestTest {
     }
 
     @Test
+    @DisplayName("Should return 500 Internal Server Error when unexpected exception occurs during sign-up")
     void testSignUpUnexpectedException() {
         Mockito.when(validationService.validate(any(SignUpDTO.class)))
                 .thenReturn(Mono.error(new RuntimeException()));
@@ -207,6 +208,7 @@ class UserRouterRestTest {
     }
 
     @Test
+    @DisplayName("Should return 500 Internal Server Error when unexpected exception occurs during sign-in")
     void testSignInUnexpectedException() {
         Mockito.when(validationService.validate(any(SignInDTO.class)))
                 .thenReturn(Mono.error(new RuntimeException()));

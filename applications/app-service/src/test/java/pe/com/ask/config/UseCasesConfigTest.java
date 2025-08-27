@@ -1,5 +1,6 @@
 package pe.com.ask.config;
 
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 import org.springframework.context.annotation.Bean;
@@ -17,9 +18,10 @@ import pe.com.ask.usecase.signup.SignUpUseCase;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.Mockito.mock;
 
-public class UseCasesConfigTest {
+class UseCasesConfigTest {
 
     @Test
+    @DisplayName("Should register SignUpUseCase bean in application context")
     void testSignUpUseCaseBeanExists() {
         try (AnnotationConfigApplicationContext context =
                      new AnnotationConfigApplicationContext(TestConfig.class)) {
@@ -30,6 +32,7 @@ public class UseCasesConfigTest {
     }
 
     @Test
+    @DisplayName("Should register SignInUseCase bean in application context")
     void testSignInUseCaseBeanExists() {
         try (AnnotationConfigApplicationContext context =
                      new AnnotationConfigApplicationContext(TestConfig.class)) {

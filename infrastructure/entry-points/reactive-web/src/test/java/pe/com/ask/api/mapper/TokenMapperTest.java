@@ -1,5 +1,6 @@
 package pe.com.ask.api.mapper;
 
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.mapstruct.factory.Mappers;
 import pe.com.ask.api.dto.response.SignInResponse;
@@ -12,6 +13,7 @@ class TokenMapperTest {
     private final TokenMapper mapper = Mappers.getMapper(TokenMapper.class);
 
     @Test
+    @DisplayName("Should map Token to SignInResponse correctly")
     void testToResponse() {
         Token token = new Token();
         token.setToken("jwt-token-123");
@@ -23,6 +25,7 @@ class TokenMapperTest {
     }
 
     @Test
+    @DisplayName("Should return null when mapping null Token")
     void testNullHandling() {
         assertNull(mapper.toResponse(null));
     }

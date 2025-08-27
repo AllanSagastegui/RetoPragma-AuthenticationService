@@ -1,5 +1,6 @@
 package pe.com.ask.r2dbc.config;
 
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.boot.test.context.runner.ApplicationContextRunner;
@@ -20,6 +21,7 @@ class PostgresqlConnectionPropertiesTest {
             );
 
     @Test
+    @DisplayName("Should bind PostgreSQL connection properties correctly from configuration")
     void testPropertiesBinding() {
         contextRunner.run(context -> {
             PostgresqlConnectionProperties props = context.getBean(PostgresqlConnectionProperties.class);

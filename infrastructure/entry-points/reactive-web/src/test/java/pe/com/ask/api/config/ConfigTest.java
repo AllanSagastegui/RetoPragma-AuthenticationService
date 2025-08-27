@@ -1,5 +1,6 @@
 package pe.com.ask.api.config;
 
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.reactive.WebFluxTest;
@@ -26,6 +27,7 @@ class ConfigTest {
     private WebTestClient webTestClient;
 
     @Test
+    @DisplayName("Should return 200 OK with security headers on GET /test")
     void testGetShouldReturnOk() {
         webTestClient.get()
                 .uri("/test")
@@ -49,6 +51,7 @@ class ConfigTest {
     }
 
     @Test
+    @DisplayName("Should return 204 No Content with security headers on POST /test")
     void testPostShouldReturnNoContent() {
         webTestClient.post()
                 .uri("/test")

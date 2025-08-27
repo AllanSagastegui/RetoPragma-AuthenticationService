@@ -26,7 +26,8 @@ public class SignUpUseCase {
         Mono<Void> checkExistingUser = userRepository.findByEmail(user.getEmail())
                 .hasElement()
                 .flatMap(emailExists -> {
-                    if (emailExists) {
+                    boolean b = emailExists;
+                    if (b) {
                         customLogger.trace("User already exists with email: {}", user.getEmail());
                         return Mono.error(new UserAlreadyExistsException());
                     }

@@ -1,6 +1,7 @@
 package pe.com.ask.r2dbc;
 
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -48,6 +49,7 @@ class RoleReactiveRepositoryAdapterTest {
     }
 
     @Test
+    @DisplayName("Should find role by name successfully")
     void testFindByName() {
         when(repository.findByName("TestRole")).thenReturn(Mono.just(entity));
         when(mapper.map(entity, Role.class)).thenReturn(domain);
@@ -58,6 +60,7 @@ class RoleReactiveRepositoryAdapterTest {
     }
 
     @Test
+    @DisplayName("Should fail when role name is incorrect")
     void testFindByNameShouldFail() {
         when(repository.findByName("WrongRole"))
                 .thenReturn(Mono.error(new RuntimeException("Role not found")));
@@ -68,6 +71,7 @@ class RoleReactiveRepositoryAdapterTest {
     }
 
     @Test
+    @DisplayName("Should return empty when role name does not exist")
     void testFindByNameShouldFailWithEmptyValue() {
         when(repository.findByName("UnknownRole")).thenReturn(Mono.empty());
 
@@ -76,6 +80,7 @@ class RoleReactiveRepositoryAdapterTest {
     }
 
     @Test
+    @DisplayName("Should fail when role name is null")
     void testFindByNameShouldFailWithNull() {
         when(repository.findByName(isNull())).thenReturn(Mono.error(new IllegalArgumentException("Name cannot be null")));
 
@@ -85,6 +90,7 @@ class RoleReactiveRepositoryAdapterTest {
     }
 
     @Test
+    @DisplayName("Should find role by ID successfully")
     void testFindById() {
         when(repository.findById(domain.getId())).thenReturn(Mono.just(entity));
         when(mapper.map(entity, Role.class)).thenReturn(domain);
@@ -95,6 +101,7 @@ class RoleReactiveRepositoryAdapterTest {
     }
 
     @Test
+    @DisplayName("Should fail when role ID is incorrect")
     void testFindByIdShouldFail() {
         UUID wrongId = UUID.randomUUID();
         when(repository.findById(wrongId))
@@ -106,6 +113,7 @@ class RoleReactiveRepositoryAdapterTest {
     }
 
     @Test
+    @DisplayName("Should return empty when role ID does not exist")
     void testFindByIdShouldFailWithEmptyValue() {
         UUID unknownId = UUID.randomUUID();
         when(repository.findById(unknownId)).thenReturn(Mono.empty());
@@ -115,6 +123,7 @@ class RoleReactiveRepositoryAdapterTest {
     }
 
     @Test
+    @DisplayName("Should fail when role ID is null")
     void testFindByIdShouldFailWithNull() {
         when(repository.findById(isNull(UUID.class)))
                 .thenReturn(Mono.error(new IllegalArgumentException("Id cannot be null")));

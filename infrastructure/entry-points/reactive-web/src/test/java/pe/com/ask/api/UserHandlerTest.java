@@ -1,6 +1,8 @@
 package pe.com.ask.api;
 
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
@@ -27,7 +29,7 @@ import java.util.UUID;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
-public class UserHandlerTest {
+class UserHandlerTest {
 
     @Mock private UserMapper userMapper;
     @Mock private TokenMapper tokenMapper;
@@ -39,15 +41,14 @@ public class UserHandlerTest {
     private UserHandler userHandler;
 
     private User userEntity;
-    private Token tokenEntity;
     private SignUpDTO signUpDTO;
     private SignInDTO signInDTO;
-    private SignUpResponse signUpResponse;
-    private SignInResponse signInResponse;
+
+    private AutoCloseable mocks;
 
     @BeforeEach
     void setUp() {
-        MockitoAnnotations.openMocks(this);
+        mocks = MockitoAnnotations.openMocks(this);
 
         userEntity = new User();
         userEntity.setId(UUID.randomUUID());
@@ -61,7 +62,7 @@ public class UserHandlerTest {
         userEntity.setPhone("987654321");
         userEntity.setBaseSalary(new BigDecimal("2500.50"));
 
-        tokenEntity = new Token();
+        Token tokenEntity = new Token();
         tokenEntity.setToken("token-example");
 
         signUpDTO = new SignUpDTO(
@@ -78,7 +79,7 @@ public class UserHandlerTest {
 
         signInDTO = new SignInDTO(userEntity.getEmail(), userEntity.getPassword());
 
-        signUpResponse = new SignUpResponse(
+        SignUpResponse signUpResponse = new SignUpResponse(
                 userEntity.getName(),
                 userEntity.getLastName(),
                 userEntity.getDni(),
@@ -89,7 +90,7 @@ public class UserHandlerTest {
                 userEntity.getBaseSalary()
         );
 
-        signInResponse = new SignInResponse(tokenEntity.getToken());
+        SignInResponse signInResponse = new SignInResponse(tokenEntity.getToken());
 
         when(validationService.validate(any(SignUpDTO.class))).thenReturn(Mono.just(signUpDTO));
         when(validationService.validate(any(SignInDTO.class))).thenReturn(Mono.just(signInDTO));
@@ -107,33 +108,41 @@ public class UserHandlerTest {
         userHandler = new UserHandler(userMapper, tokenMapper, validationService, signUpUseCase, signInUseCase);
     }
 
+    @AfterEach
+    void tearDown() throws Exception {
+        mocks.close();
+    }
+
     @Test
+    @DisplayName("Should handle POST /usuarios request and return ServerResponse")
     void testListenPOSTSignUpUseCase() {
         when(serverRequest.bodyToMono(SignUpDTO.class)).thenReturn(Mono.just(signUpDTO));
 
         Mono<ServerResponse> result = userHandler.listenPOSTSignUpUseCase(serverRequest);
 
         StepVerifier.create(result)
-                .expectNextMatches(res -> res instanceof ServerResponse)
+                .expectNextMatches(ServerResponse.class::isInstance)
                 .verifyComplete();
 
         verify(signUpUseCase, times(1)).signUpUser(userEntity);
     }
 
     @Test
+    @DisplayName("Should handle POST /login request and return ServerResponse")
     void testListenPOSTSignInUseCase() {
         when(serverRequest.bodyToMono(SignInDTO.class)).thenReturn(Mono.just(signInDTO));
 
         Mono<ServerResponse> result = userHandler.listenPOSTSignInUseCase(serverRequest);
 
         StepVerifier.create(result)
-                .expectNextMatches(res -> res instanceof ServerResponse)
+                .expectNextMatches(ServerResponse.class::isInstance)
                 .verifyComplete();
 
         verify(signInUseCase, times(1)).signInUser(signInDTO.email(), signInDTO.password());
     }
 
     @Test
+    @DisplayName("Should return empty Mono when signUpDoc is invoked")
     void testSignUpDocReturnsEmpty() {
         StepVerifier.create(userHandler.signUpDoc(signUpDTO))
                 .expectNextCount(0)
@@ -141,6 +150,7 @@ public class UserHandlerTest {
     }
 
     @Test
+    @DisplayName("Should return empty Mono when signInDoc is invoked")
     void testSignInDocReturnsEmpty() {
         StepVerifier.create(userHandler.signInDoc(signInDTO))
                 .expectNextCount(0)
