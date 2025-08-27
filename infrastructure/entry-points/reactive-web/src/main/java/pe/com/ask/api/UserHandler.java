@@ -13,6 +13,7 @@ import pe.com.ask.api.exception.model.UnexpectedException;
 import pe.com.ask.api.exception.service.ValidationService;
 import pe.com.ask.api.mapper.TokenMapper;
 import pe.com.ask.api.mapper.UserMapper;
+import pe.com.ask.model.gateways.CustomLogger;
 import pe.com.ask.usecase.exception.BaseException;
 import pe.com.ask.usecase.signin.SignInUseCase;
 import pe.com.ask.usecase.signup.SignUpUseCase;

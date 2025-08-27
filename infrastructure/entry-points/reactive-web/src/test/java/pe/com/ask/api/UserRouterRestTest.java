@@ -178,17 +178,21 @@ class UserRouterRestTest {
     @Test
     @DisplayName("Should return validation error when sign-in request fails validation")
     void testSignInEndpointValidationFailure() {
+        ValidationException validationException = new ValidationException(Map.of(
+                "email", "Email is required"
+        ));
+
         Mockito.when(validationService.validate(any(SignInDTO.class)))
-                .thenReturn(Mono.error(new RuntimeException("Validation failed")));
+                .thenReturn(Mono.error(validationException));
 
         webTestClient.post()
                 .uri("/api/v1/login")
                 .contentType(MediaType.APPLICATION_JSON)
                 .bodyValue(signInDTO)
                 .exchange()
-                .expectStatus().is5xxServerError()
+                .expectStatus().isEqualTo(validationException.getStatus())
                 .expectBody()
-                .jsonPath("$.errors").exists();
+                .jsonPath("$.errors.email").isEqualTo("Email is required");
     }
 
     @Test

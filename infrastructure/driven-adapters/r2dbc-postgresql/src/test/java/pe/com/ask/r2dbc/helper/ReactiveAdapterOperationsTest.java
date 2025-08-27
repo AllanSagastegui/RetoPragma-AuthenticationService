@@ -12,6 +12,7 @@ import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
 
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 
@@ -102,6 +103,30 @@ class ReactiveAdapterOperationsTest {
                 .verifyComplete();
     }
 
+    @Test
+    @DisplayName("Should convert data to entity successfully")
+    void toEntityReturnsEntity() {
+        DummyData data = new DummyData("1", "test");
+        TestAdapter adapter = new TestAdapter(repository, mapper);
+
+        DummyEntity entity = adapter.toEntity(data);
+
+        assertNotNull(entity);
+        assertEquals("1", entity.id());
+        assertEquals("test", entity.name());
+    }
+
+    @Test
+    @DisplayName("Should return null when converting null data")
+    void toEntityReturnsNullWhenDataIsNull() {
+        TestAdapter adapter = new TestAdapter(repository, mapper);
+
+        DummyEntity entity = adapter.toEntity(null);
+
+        assertNull(entity);
+    }
+
+
     record DummyEntity(String id, String name) {
 
         public static DummyEntity toEntity(DummyData data) {
@@ -121,14 +146,25 @@ class ReactiveAdapterOperationsTest {
     record DummyData(String id, String name) {
 
         @Override
-            public boolean equals(Object o) {
-                if (this == o) return true;
-                if (o == null || getClass() != o.getClass()) return false;
-                DummyData that = (DummyData) o;
-                return id.equals(that.id) && name.equals(that.name);
-            }
+        public boolean equals(Object o) {
+            if (this == o) return true;
+            if (o == null || getClass() != o.getClass()) return false;
+            DummyData that = (DummyData) o;
+            return id.equals(that.id) && name.equals(that.name);
+        }
 
     }
 
     interface DummyRepository extends ReactiveCrudRepository<DummyData, String>, ReactiveQueryByExampleExecutor<DummyData> {}
+
+    static class TestAdapter extends ReactiveAdapterOperations<DummyEntity, DummyData, String, DummyRepository> {
+        public TestAdapter(DummyRepository repository, ObjectMapper mapper) {
+            super(repository, mapper, DummyEntity::toEntity);
+        }
+
+        @Override
+        public DummyEntity toEntity(DummyData data) {
+            return super.toEntity(data);
+        }
+    }
 }
