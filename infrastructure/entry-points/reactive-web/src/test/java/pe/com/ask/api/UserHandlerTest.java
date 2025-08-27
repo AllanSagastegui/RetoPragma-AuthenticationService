@@ -6,6 +6,7 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.web.reactive.function.server.ServerRequest;
 import org.springframework.web.reactive.function.server.ServerResponse;
 import pe.com.ask.api.dto.request.SignInDTO;
@@ -15,6 +16,7 @@ import pe.com.ask.api.dto.response.SignUpResponse;
 import pe.com.ask.api.exception.service.ValidationService;
 import pe.com.ask.api.mapper.TokenMapper;
 import pe.com.ask.api.mapper.UserMapper;
+import pe.com.ask.model.gateways.CustomLogger;
 import pe.com.ask.model.user.User;
 import pe.com.ask.model.token.Token;
 import pe.com.ask.usecase.signin.SignInUseCase;
@@ -37,6 +39,7 @@ class UserHandlerTest {
     @Mock private SignUpUseCase signUpUseCase;
     @Mock private SignInUseCase signInUseCase;
     @Mock private ServerRequest serverRequest;
+    @Mock private CustomLogger customLogger;
 
     private UserHandler userHandler;
 
@@ -105,7 +108,7 @@ class UserHandlerTest {
         when(tokenMapper.toResponse(any(Token.class)))
                 .thenReturn(signInResponse);
 
-        userHandler = new UserHandler(userMapper, tokenMapper, validationService, signUpUseCase, signInUseCase);
+        userHandler = new UserHandler(userMapper, tokenMapper, validationService, customLogger, signUpUseCase, signInUseCase);
     }
 
     @AfterEach

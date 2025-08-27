@@ -120,7 +120,7 @@ class UserRouterRestTest {
         Mockito.when(tokenMapper.toResponse(any(Token.class)))
                 .thenReturn(signInResponse);
 
-        UserHandler handler = new UserHandler(userMapper, tokenMapper, validationService, signUpUseCase, signInUseCase);
+        UserHandler handler = new UserHandler(userMapper, tokenMapper, validationService, customLogger, signUpUseCase, signInUseCase);
         webTestClient = WebTestClient.bindToRouterFunction(
                 new UserRouterRest().userRouterFunction(handler, new GlobalExceptionFilter(customLogger))
         ).build();

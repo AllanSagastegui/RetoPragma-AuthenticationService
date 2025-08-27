@@ -8,6 +8,7 @@ import pe.com.ask.model.user.User;
 import pe.com.ask.model.user.gateways.PasswordHasher;
 import pe.com.ask.model.user.gateways.UserRepository;
 import pe.com.ask.usecase.exception.InvalidCredentialsException;
+import pe.com.ask.usecase.utils.logmessages.SignInUseCaseLog;
 import reactor.core.publisher.Mono;
 
 @RequiredArgsConstructor
@@ -18,28 +19,27 @@ public class SignInUseCase {
     private final CustomLogger customLogger;
 
     public Mono<Token> signInUser(String email, String password){
-        customLogger.trace("Start sign-in User flow");
-            return userRepository.findByEmail(email)
-                    .doOnSubscribe(sub -> customLogger.trace("Subscribed to findByEmail for {}", email))
-                    .doOnNext(user -> customLogger.trace("User found {}", user.getEmail()))
-                    .switchIfEmpty(Mono.defer(() -> {
-                        customLogger.trace("User not found for {}", email);
-                        return Mono.error(new InvalidCredentialsException());
-                    }))
-                    .flatMap(user -> validatePassword(user, password))
-                    .flatMap(tokenRepository::generateAccessToken)
-                    .doOnSuccess(token -> customLogger.trace("Token generated successfully for email: {}", email))
-                    .doOnError(err -> customLogger.trace("Sign-in error for {}: {}", email, err.getMessage()));
-
+        customLogger.trace(SignInUseCaseLog.START_FLOW);
+        return userRepository.findByEmail(email)
+                .doOnSubscribe(sub -> customLogger.trace(SignInUseCaseLog.SUBSCRIBED_FIND_BY_EMAIL, email))
+                .doOnNext(user -> customLogger.trace(SignInUseCaseLog.USER_FOUND, user.getEmail()))
+                .switchIfEmpty(Mono.defer(() -> {
+                    customLogger.trace(SignInUseCaseLog.USER_NOT_FOUND, email);
+                    return Mono.error(new InvalidCredentialsException());
+                }))
+                .flatMap(user -> validatePassword(user, password))
+                .flatMap(tokenRepository::generateAccessToken)
+                .doOnSuccess(token -> customLogger.trace(SignInUseCaseLog.TOKEN_GENERATED, email))
+                .doOnError(err -> customLogger.trace(SignInUseCaseLog.SIGNIN_ERROR, email, err.getMessage()));
     }
 
     private Mono<User> validatePassword(User user, String rawPassword){
-        customLogger.trace("Validating password for user: {}", user.getEmail());
+        customLogger.trace(SignInUseCaseLog.VALIDATING_PASSWORD, user.getEmail());
         return Mono.just(user)
                 .filter(u -> passwordHasher.matches(rawPassword, u.getPassword()))
-                .doOnNext(u -> customLogger.trace("Password validation passed for user: {}", u.getEmail()))
+                .doOnNext(u -> customLogger.trace(SignInUseCaseLog.PASSWORD_VALIDATION_PASSED, u.getEmail()))
                 .switchIfEmpty(Mono.defer(() -> {
-                    customLogger.trace("Password validation failed for user: {}", user.getEmail());
+                    customLogger.trace(SignInUseCaseLog.PASSWORD_VALIDATION_FAILED, user.getEmail());
                     return Mono.error(new InvalidCredentialsException());
                 }));
     }

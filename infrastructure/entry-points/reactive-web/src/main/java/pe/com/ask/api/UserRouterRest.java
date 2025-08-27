@@ -17,6 +17,7 @@ import pe.com.ask.api.dto.request.SignUpDTO;
 import pe.com.ask.api.dto.response.SignInResponse;
 import pe.com.ask.api.dto.response.SignUpResponse;
 import pe.com.ask.api.exception.GlobalExceptionFilter;
+import pe.com.ask.api.utils.routes.Routes;
 
 import static org.springframework.web.reactive.function.server.RequestPredicates.POST;
 import static org.springframework.web.reactive.function.server.RouterFunctions.route;
@@ -103,8 +104,8 @@ public class UserRouterRest {
             )
     })
     public RouterFunction<ServerResponse> userRouterFunction(UserHandler userHandler, GlobalExceptionFilter filter) {
-        return route(POST("/api/v1/usuarios"), userHandler::listenPOSTSignUpUseCase)
-                .andRoute(POST("/api/v1/login"), userHandler::listenPOSTSignInUseCase)
+        return route(POST(Routes.SIGNUP), userHandler::listenPOSTSignUpUseCase)
+                .andRoute(POST(Routes.SIGNIN), userHandler::listenPOSTSignInUseCase)
                 .filter(filter);
     }
 }
