@@ -52,7 +52,7 @@ public class UserHandler {
                         .bodyValue(response))
                 .doOnSuccess(resp -> logger.trace(SignUpLog.SIGNUP_RESPONSE_CREATED))
                 .onErrorResume(ex -> {
-                    logger.trace(SignUpLog.SIGNUP_ERROR, ex.getMessage(), ex);
+                    logger.trace(SignUpLog.SIGNUP_ERROR, ex.getMessage());
                     return Mono.error(
                             ex instanceof BaseException ? ex : new UnexpectedException(ex)
                     );
@@ -76,7 +76,7 @@ public class UserHandler {
                         .bodyValue(response))
                 .doOnSuccess(resp -> logger.trace(SignInLog.SIGNIN_RESPONSE_CREATED))
                 .onErrorResume(ex -> {
-                    logger.trace(SignInLog.SIGNIN_ERROR, ex.getMessage(), ex);
+                    logger.trace(SignInLog.SIGNIN_ERROR, ex.getMessage());
                     return Mono.error(
                             ex instanceof BaseException ? ex : new UnexpectedException(ex)
                     );
