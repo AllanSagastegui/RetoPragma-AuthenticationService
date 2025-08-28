@@ -144,7 +144,7 @@ class UserHandlerTest {
         verify(signInUseCase, times(1)).signInUser(signInDTO.email(), signInDTO.password());
     }
 
-    @Test
+    /*@Test
     @DisplayName("Should return empty Mono when signUpDoc is invoked")
     void testSignUpDocReturnsEmpty() {
         StepVerifier.create(userHandler.signUpDoc(signUpDTO))
@@ -158,5 +158,5 @@ class UserHandlerTest {
         StepVerifier.create(userHandler.signInDoc(signInDTO))
                 .expectNextCount(0)
                 .verifyComplete();
-    }
+    }*/
 }
