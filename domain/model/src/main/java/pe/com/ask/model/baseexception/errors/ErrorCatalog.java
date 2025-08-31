@@ -1,4 +1,4 @@
-package pe.com.ask.usecase.utils.errors;
+package pe.com.ask.model.baseexception.errors;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -43,6 +43,49 @@ public enum ErrorCatalog {
             "Something went wrong on our side. Please try again later or contact support if the issue persists.",
             500,
             Map.of("server", "Unexpected error occurred")
+    ),
+    JWT_EXPIRED(
+            "AUTH_JWT_EXPIRED",
+            "JWT Expired",
+            "Your session has expired. Please log in again.",
+            401,
+            Map.of("token", "The provided JWT has expired")
+    ),
+    JWT_INVALID_SIGNATURE(
+            "AUTH_JWT_INVALID_SIGNATURE",
+            "Invalid JWT Signature",
+            "The signature of the provided JWT is invalid.",
+            401,
+            Map.of("token", "Invalid token signature")
+    ),
+    JWT_MALFORMED(
+            "AUTH_JWT_MALFORMED",
+            "Malformed JWT",
+            "The provided JWT is malformed or corrupted.",
+            400,
+            Map.of("token", "Malformed JWT")
+    ),
+    JWT_GENERIC(
+            "AUTH_JWT_GENERIC",
+            "JWT Error",
+            "An error occurred while processing the JWT.",
+            401,
+            Map.of("token", "Generic JWT processing error")
+    ),
+    UNAUTHORIZED(
+            "AUTH_UNAUTHORIZED",
+            "Unauthorized",
+            "You are not authenticated. Please log in to access this resource.",
+            401,
+            Map.of("user", "Authentication required")
+    ),
+
+    ACCESS_DENIED(
+            "AUTH_ACCESS_DENIED",
+            "Access Denied",
+            "You do not have permission to access this resource.",
+            403,
+            Map.of("user", "You lack the necessary permissions")
     );
 
     private final String errorCode;

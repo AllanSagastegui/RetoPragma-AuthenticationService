@@ -1,22 +1,12 @@
 package pe.com.ask.api;
 
-import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.media.Content;
-import io.swagger.v3.oas.annotations.media.Schema;
-import io.swagger.v3.oas.annotations.parameters.RequestBody;
-import io.swagger.v3.oas.annotations.responses.ApiResponse;
-import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
-import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.reactive.function.server.ServerRequest;
 import org.springframework.web.reactive.function.server.ServerResponse;
 import pe.com.ask.api.dto.request.SignUpDTO;
 import pe.com.ask.api.dto.request.SignInDTO;
-import pe.com.ask.api.dto.response.SignInResponse;
-import pe.com.ask.api.dto.response.SignUpResponse;
-import pe.com.ask.api.exception.model.ErrorResponse;
 import pe.com.ask.api.exception.model.UnexpectedException;
 import pe.com.ask.api.exception.service.ValidationService;
 import pe.com.ask.api.utils.logmessages.SignInLog;
@@ -24,12 +14,10 @@ import pe.com.ask.api.utils.logmessages.SignUpLog;
 import pe.com.ask.api.mapper.TokenMapper;
 import pe.com.ask.api.mapper.UserMapper;
 import pe.com.ask.model.gateways.CustomLogger;
-import pe.com.ask.usecase.exception.BaseException;
+import pe.com.ask.model.baseexception.BaseException;
 import pe.com.ask.usecase.signin.SignInUseCase;
 import pe.com.ask.usecase.signup.SignUpUseCase;
 import reactor.core.publisher.Mono;
-
-import java.net.URI;
 
 @Component
 @RequiredArgsConstructor

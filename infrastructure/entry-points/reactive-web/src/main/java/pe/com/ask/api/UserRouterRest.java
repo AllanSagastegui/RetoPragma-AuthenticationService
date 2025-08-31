@@ -10,7 +10,6 @@ import org.springframework.web.reactive.function.server.RouterFunction;
 import org.springframework.web.reactive.function.server.ServerResponse;
 import pe.com.ask.api.doc.SignInDoc;
 import pe.com.ask.api.doc.SignUpDoc;
-import pe.com.ask.api.exception.GlobalExceptionFilter;
 import pe.com.ask.api.utils.routes.Routes;
 
 import static org.springframework.web.reactive.function.server.RequestPredicates.POST;
@@ -34,9 +33,8 @@ public class UserRouterRest {
                     beanMethod = "signInDoc"
             )
     })
-    public RouterFunction<ServerResponse> userRouterFunction(UserHandler userHandler, GlobalExceptionFilter filter) {
+    public RouterFunction<ServerResponse> userRouterFunction(UserHandler userHandler) {
         return route(POST(Routes.SIGNUP).and(accept(MediaType.APPLICATION_JSON)), userHandler::listenPOSTSignUpUseCase)
-                .andRoute(POST(Routes.SIGNIN).and(accept(MediaType.APPLICATION_JSON)), userHandler::listenPOSTSignInUseCase)
-                .filter(filter);
+                .andRoute(POST(Routes.SIGNIN).and(accept(MediaType.APPLICATION_JSON)), userHandler::listenPOSTSignInUseCase);
     }
 }

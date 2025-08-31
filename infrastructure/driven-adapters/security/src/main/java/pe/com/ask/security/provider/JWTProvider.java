@@ -1,5 +1,6 @@
 package pe.com.ask.security.provider;
 
+import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
@@ -7,6 +8,10 @@ import pe.com.ask.model.role.gateways.RoleRepository;
 import pe.com.ask.model.token.Token;
 import pe.com.ask.model.user.User;
 import pe.com.ask.security.enums.TokenExpirationTime;
+import pe.com.ask.security.exception.JwtException;
+import pe.com.ask.security.exception.JwtExpiredException;
+import pe.com.ask.security.exception.JwtInvalidSignatureException;
+import pe.com.ask.security.exception.JwtMalformedException;
 import reactor.core.publisher.Mono;
 
 import javax.management.relation.RoleNotFoundException;
@@ -36,9 +41,27 @@ public class JWTProvider {
                         .claims(Map.of(
                                 "role", role.getName()
                         ))
-                        .signWith(privateKey)
+                        .signWith(privateKey, Jwts.SIG.RS256)
                         .compact()
                 )
                 .map(Token::new);
+    }
+
+    public Mono<Claims> extractAllClaims(String token) {
+        return Mono.fromCallable(() -> Jwts.parser()
+                .verifyWith(publicKey)
+                .build()
+                .parseSignedClaims(token)
+                .getPayload()
+        )
+                .onErrorMap(io.jsonwebtoken.ExpiredJwtException.class, ex -> new JwtExpiredException())
+                .onErrorMap(io.jsonwebtoken.security.SignatureException.class, ex -> new JwtInvalidSignatureException())
+                .onErrorMap(io.jsonwebtoken.MalformedJwtException.class, ex -> new JwtMalformedException());
+    }
+
+    public Mono<Boolean> isTokenValid(String token) {
+        return extractAllClaims(token)
+                .map(claims -> claims.getExpiration().after(new Date()))
+                .onErrorReturn(false);
     }
 }

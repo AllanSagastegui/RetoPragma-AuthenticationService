@@ -7,15 +7,17 @@ import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.reactive.WebFluxTest;
+import org.springframework.context.ApplicationContext;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.reactive.server.WebTestClient;
+import org.springframework.web.reactive.function.server.RouterFunctions;
 import pe.com.ask.api.dto.request.SignInDTO;
 import pe.com.ask.api.dto.request.SignUpDTO;
 import pe.com.ask.api.dto.response.SignInResponse;
 import pe.com.ask.api.dto.response.SignUpResponse;
-import pe.com.ask.api.exception.GlobalExceptionFilter;
+import pe.com.ask.api.exception.GlobalWebExceptionHandler;
 import pe.com.ask.api.exception.model.ValidationException;
 import pe.com.ask.api.exception.service.ValidationService;
 import pe.com.ask.api.mapper.TokenMapper;
@@ -38,13 +40,16 @@ import static org.mockito.ArgumentMatchers.anyString;
 @ContextConfiguration(classes = {
         UserRouterRest.class,
         UserHandler.class,
-        GlobalExceptionFilter.class
+        GlobalWebExceptionHandler.class
 })
 @WebFluxTest
 class UserRouterRestTest {
 
     @Autowired
     private WebTestClient webTestClient;
+
+    @Autowired
+    private ApplicationContext context;
 
     @MockitoBean private SignUpUseCase signUpUseCase;
     @MockitoBean private SignInUseCase signInUseCase;
@@ -121,9 +126,11 @@ class UserRouterRestTest {
                 .thenReturn(signInResponse);
 
         UserHandler handler = new UserHandler(userMapper, tokenMapper, validationService, customLogger, signUpUseCase, signInUseCase);
-        webTestClient = WebTestClient.bindToRouterFunction(
-                new UserRouterRest().userRouterFunction(handler, new GlobalExceptionFilter(customLogger))
-        ).build();
+        webTestClient = WebTestClient.bindToApplicationContext(context)
+                .configureClient()
+                .baseUrl("/api/v1")
+                .build();
+
     }
 
     @Test
