@@ -10,6 +10,7 @@ import pe.com.ask.model.token.gateways.TokenRepository;
 import pe.com.ask.model.user.gateways.PasswordHasher;
 import pe.com.ask.model.user.gateways.UserRepository;
 import pe.com.ask.model.gateways.TransactionalGateway;
+import pe.com.ask.usecase.getusersbyid.GetUsersByIdUseCase;
 import pe.com.ask.usecase.signin.SignInUseCase;
 import pe.com.ask.usecase.signup.SignUpUseCase;
 
@@ -40,5 +41,10 @@ public class UseCasesConfig {
             CustomLogger customLogger
     ) {
         return new SignInUseCase(userRepository, tokenRepository, passwordHasher, customLogger);
+    }
+
+    @Bean
+    GetUsersByIdUseCase  getUsersByIdUseCase(UserRepository userRepository, CustomLogger logger){
+        return new GetUsersByIdUseCase(userRepository, logger);
     }
 }

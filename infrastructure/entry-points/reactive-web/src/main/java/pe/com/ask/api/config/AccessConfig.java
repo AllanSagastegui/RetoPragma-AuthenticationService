@@ -20,6 +20,4 @@ public class AccessConfig {
     public ServerAuthenticationEntryPoint authenticationEntryPoint() {
         return (exchange, ex) -> Mono.error(new UnauthorizedException());
     }
-
-
 }

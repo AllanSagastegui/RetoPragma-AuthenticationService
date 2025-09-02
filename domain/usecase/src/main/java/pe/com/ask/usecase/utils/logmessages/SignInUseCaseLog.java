@@ -1,6 +1,6 @@
 package pe.com.ask.usecase.utils.logmessages;
 
-public class SignInUseCaseLog {
+public final class SignInUseCaseLog {
 
     private SignInUseCaseLog() {}
 

@@ -1,7 +1,9 @@
 package pe.com.ask.api;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.stereotype.Component;
 import org.springframework.web.reactive.function.server.ServerRequest;
 import org.springframework.web.reactive.function.server.ServerResponse;
@@ -9,15 +11,21 @@ import pe.com.ask.api.dto.request.SignUpDTO;
 import pe.com.ask.api.dto.request.SignInDTO;
 import pe.com.ask.api.exception.model.UnexpectedException;
 import pe.com.ask.api.exception.service.ValidationService;
+import pe.com.ask.api.utils.logmessages.GetAllClientsLog;
 import pe.com.ask.api.utils.logmessages.SignInLog;
 import pe.com.ask.api.utils.logmessages.SignUpLog;
 import pe.com.ask.api.mapper.TokenMapper;
 import pe.com.ask.api.mapper.UserMapper;
 import pe.com.ask.model.gateways.CustomLogger;
 import pe.com.ask.model.baseexception.BaseException;
+import pe.com.ask.usecase.getusersbyid.GetUsersByIdUseCase;
 import pe.com.ask.usecase.signin.SignInUseCase;
 import pe.com.ask.usecase.signup.SignUpUseCase;
 import reactor.core.publisher.Mono;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.UUID;
 
 @Component
 @RequiredArgsConstructor
@@ -29,6 +37,7 @@ public class UserHandler {
 
     private final SignUpUseCase signUpUseCase;
     private final SignInUseCase signInUseCase;
+    private final GetUsersByIdUseCase getUsersByIdUseCase;
 
     public Mono<ServerResponse> listenPOSTSignUpUseCase(ServerRequest serverRequest) {
         return serverRequest.bodyToMono(SignUpDTO.class)
@@ -74,6 +83,29 @@ public class UserHandler {
                 .doOnSuccess(resp -> logger.trace(SignInLog.SIGNIN_RESPONSE_CREATED))
                 .onErrorResume(ex -> {
                     logger.trace(SignInLog.SIGNIN_ERROR, ex.getMessage());
+                    return Mono.error(
+                            ex instanceof BaseException ? ex : new UnexpectedException(ex)
+                    );
+                });
+    }
+
+    public Mono<ServerResponse> listenGETAllClientsUseCase(ServerRequest serverRequest) {
+        return serverRequest.bodyToMono(new ParameterizedTypeReference<List<UUID>>() { })
+                .map(ArrayList::new)
+                .defaultIfEmpty(new ArrayList<>())
+                .flatMapMany(getUsersByIdUseCase::getUsersByIds)
+                .doOnSubscribe(sub -> logger.trace(GetAllClientsLog.START_FLOW))
+                .doOnNext(user -> logger.trace(GetAllClientsLog.CLIENT_FOUND, user.getEmail()))
+                .map(userMapper::toGetAllClientsResponse)
+                .collectList()
+                .flatMap(response ->
+                        ServerResponse.status(HttpStatus.OK)
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .bodyValue(response)
+                )
+                .doOnSuccess(resp -> logger.trace(GetAllClientsLog.END_FLOW))
+                .onErrorResume(ex -> {
+                    logger.trace(GetAllClientsLog.ERROR, ex.getMessage());
                     return Mono.error(
                             ex instanceof BaseException ? ex : new UnexpectedException(ex)
                     );

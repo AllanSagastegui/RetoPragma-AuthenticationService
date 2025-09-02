@@ -12,7 +12,6 @@ import org.springframework.http.MediaType;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.reactive.server.WebTestClient;
-import org.springframework.web.reactive.function.server.RouterFunctions;
 import pe.com.ask.api.dto.request.SignInDTO;
 import pe.com.ask.api.dto.request.SignUpDTO;
 import pe.com.ask.api.dto.response.SignInResponse;
@@ -25,6 +24,7 @@ import pe.com.ask.api.mapper.UserMapper;
 import pe.com.ask.model.gateways.CustomLogger;
 import pe.com.ask.model.token.Token;
 import pe.com.ask.model.user.User;
+import pe.com.ask.usecase.getusersbyid.GetUsersByIdUseCase;
 import pe.com.ask.usecase.signin.SignInUseCase;
 import pe.com.ask.usecase.signup.SignUpUseCase;
 import reactor.core.publisher.Mono;
@@ -53,6 +53,7 @@ class UserRouterRestTest {
 
     @MockitoBean private SignUpUseCase signUpUseCase;
     @MockitoBean private SignInUseCase signInUseCase;
+    @MockitoBean private GetUsersByIdUseCase getUsersByIdUseCase;
     @MockitoBean private UserMapper userMapper;
     @MockitoBean private TokenMapper tokenMapper;
     @MockitoBean private ValidationService validationService;
@@ -125,7 +126,7 @@ class UserRouterRestTest {
         Mockito.when(tokenMapper.toResponse(any(Token.class)))
                 .thenReturn(signInResponse);
 
-        UserHandler handler = new UserHandler(userMapper, tokenMapper, validationService, customLogger, signUpUseCase, signInUseCase);
+        UserHandler handler = new UserHandler(userMapper, tokenMapper, validationService, customLogger, signUpUseCase, signInUseCase, getUsersByIdUseCase);
         webTestClient = WebTestClient.bindToApplicationContext(context)
                 .configureClient()
                 .baseUrl("/api/v1")

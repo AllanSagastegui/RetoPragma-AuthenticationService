@@ -31,7 +31,7 @@ public class JWTFilter implements WebFilter {
                 .flatMap(jwt -> jwtProvider.extractAllClaims(jwt)
                         .flatMap(claims -> {
                             var authorities = List.of(new SimpleGrantedAuthority("ROLE_" + claims.get("role")));
-                            var auth = new UsernamePasswordAuthenticationToken(claims.getSubject(), null, authorities);
+                            var auth = new UsernamePasswordAuthenticationToken(claims.getSubject(), jwt, authorities);
 
                             return jwtProvider.isTokenValid(jwt)
                                     .filter(Boolean::booleanValue)

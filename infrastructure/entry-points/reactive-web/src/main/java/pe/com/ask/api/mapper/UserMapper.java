@@ -2,6 +2,7 @@ package pe.com.ask.api.mapper;
 
 import org.mapstruct.Mapper;
 import pe.com.ask.api.dto.request.SignUpDTO;
+import pe.com.ask.api.dto.response.GetAllClientsResponse;
 import pe.com.ask.api.dto.response.SignUpResponse;
 import pe.com.ask.model.user.User;
 
@@ -34,6 +35,18 @@ public interface UserMapper {
                 user.getBirthday().toString(),
                 user.getAddress(),
                 user.getPhone(),
+                user.getBaseSalary()
+        );
+    }
+
+    default GetAllClientsResponse toGetAllClientsResponse(User user) {
+        if (user == null) return null;
+        return new GetAllClientsResponse(
+                user.getId(),
+                user.getName(),
+                user.getLastName(),
+                user.getDni(),
+                user.getEmail(),
                 user.getBaseSalary()
         );
     }

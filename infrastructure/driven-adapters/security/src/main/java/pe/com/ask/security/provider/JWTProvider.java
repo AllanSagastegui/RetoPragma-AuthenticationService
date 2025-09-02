@@ -8,7 +8,6 @@ import pe.com.ask.model.role.gateways.RoleRepository;
 import pe.com.ask.model.token.Token;
 import pe.com.ask.model.user.User;
 import pe.com.ask.security.enums.TokenExpirationTime;
-import pe.com.ask.security.exception.JwtException;
 import pe.com.ask.security.exception.JwtExpiredException;
 import pe.com.ask.security.exception.JwtInvalidSignatureException;
 import pe.com.ask.security.exception.JwtMalformedException;
@@ -39,7 +38,9 @@ public class JWTProvider {
                         .expiration(Date.from(Instant.now()
                                 .plusSeconds(TokenExpirationTime.ACCESS.getSeconds())))
                         .claims(Map.of(
-                                "role", role.getName()
+                                "role", role.getName(),
+                                "userId",  user.getId().toString(),
+                                "userDni", user.getDni()
                         ))
                         .signWith(privateKey, Jwts.SIG.RS256)
                         .compact()

@@ -1,6 +1,6 @@
 package pe.com.ask.api.utils.logmessages;
 
-public class SignInLog {
+public final class SignInLog {
 
     private SignInLog() {}
 

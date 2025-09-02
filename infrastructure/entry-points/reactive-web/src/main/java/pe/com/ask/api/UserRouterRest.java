@@ -12,8 +12,7 @@ import pe.com.ask.api.doc.SignInDoc;
 import pe.com.ask.api.doc.SignUpDoc;
 import pe.com.ask.api.utils.routes.Routes;
 
-import static org.springframework.web.reactive.function.server.RequestPredicates.POST;
-import static org.springframework.web.reactive.function.server.RequestPredicates.accept;
+import static org.springframework.web.reactive.function.server.RequestPredicates.*;
 import static org.springframework.web.reactive.function.server.RouterFunctions.route;
 
 @Configuration
@@ -35,6 +34,7 @@ public class UserRouterRest {
     })
     public RouterFunction<ServerResponse> userRouterFunction(UserHandler userHandler) {
         return route(POST(Routes.SIGNUP).and(accept(MediaType.APPLICATION_JSON)), userHandler::listenPOSTSignUpUseCase)
-                .andRoute(POST(Routes.SIGNIN).and(accept(MediaType.APPLICATION_JSON)), userHandler::listenPOSTSignInUseCase);
+                .andRoute(POST(Routes.SIGNIN).and(accept(MediaType.APPLICATION_JSON)), userHandler::listenPOSTSignInUseCase)
+                .andRoute(POST(Routes.GETUSERSBYID), userHandler::listenGETAllClientsUseCase);
     }
 }
