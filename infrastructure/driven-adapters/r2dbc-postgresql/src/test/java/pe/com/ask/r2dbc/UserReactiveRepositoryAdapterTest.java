@@ -10,11 +10,13 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.reactivecommons.utils.ObjectMapper;
 import pe.com.ask.model.user.User;
 import pe.com.ask.r2dbc.entity.UserEntity;
+import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.util.List;
 import java.util.UUID;
 
 import static org.mockito.ArgumentMatchers.isNull;
@@ -192,6 +194,44 @@ class UserReactiveRepositoryAdapterTest {
 
         StepVerifier.create(repositoryAdapter.findByDni(null))
                 .expectErrorMessage("DNI is null")
+                .verify();
+    }
+
+    @Test
+    @DisplayName("Should get users by IDs successfully")
+    void testGetUsersByIds() {
+        List<UUID> ids = List.of(domain.getId());
+
+        when(repository.findAllById(ids)).thenReturn(Flux.just(entity));
+        when(mapper.map(entity, User.class)).thenReturn(domain);
+
+        StepVerifier.create(repositoryAdapter.getUsersByIds(ids))
+                .expectNextMatches(user -> user.getId().equals(domain.getId()))
+                .verifyComplete();
+    }
+
+    @Test
+    @DisplayName("Should return empty when no users found for given IDs")
+    void testGetUsersByIdsEmpty() {
+        List<UUID> ids = List.of(UUID.randomUUID());
+
+        when(repository.findAllById(ids)).thenReturn(Flux.empty());
+
+        StepVerifier.create(repositoryAdapter.getUsersByIds(ids))
+                .expectComplete()
+                .verify();
+    }
+
+    @Test
+    @DisplayName("Should fail when repository throws error on getUsersByIds")
+    void testGetUsersByIdsError() {
+        List<UUID> ids = List.of(domain.getId());
+
+        when(repository.findAllById(ids))
+                .thenReturn(Flux.error(new RuntimeException("Database error")));
+
+        StepVerifier.create(repositoryAdapter.getUsersByIds(ids))
+                .expectErrorMessage("Database error")
                 .verify();
     }
 }

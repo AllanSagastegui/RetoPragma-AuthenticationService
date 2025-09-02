@@ -4,11 +4,13 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.mapstruct.factory.Mappers;
 import pe.com.ask.api.dto.request.SignUpDTO;
+import pe.com.ask.api.dto.response.GetAllClientsResponse;
 import pe.com.ask.api.dto.response.SignUpResponse;
 import pe.com.ask.model.user.User;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -74,9 +76,36 @@ class UserMapperTest {
     }
 
     @Test
+    @DisplayName("Should map User entity to GetAllClientsResponse correctly")
+    void testToGetAllClientsResponse() {
+        UUID userId = UUID.randomUUID();
+        User user = User.builder()
+                .id(userId)
+                .name("Allan")
+                .lastName("Sagastegui")
+                .dni("12345678")
+                .email("allan@example.com")
+                .baseSalary(new BigDecimal("2500.0"))
+                .build();
+
+        GetAllClientsResponse response = mapper.toGetAllClientsResponse(user);
+
+        assertNotNull(response);
+        assertEquals(user.getId(), response.id());
+        assertEquals(user.getName(), response.name());
+        assertEquals(user.getLastName(), response.lastName());
+        assertEquals(user.getDni(), response.dni());
+        assertEquals(user.getEmail(), response.email());
+        assertEquals(user.getBaseSalary(), response.baseSalary());
+    }
+
+
+
+    @Test
     @DisplayName("Should return null when mapping null values")
     void testNullHandling() {
         assertNull(mapper.toEntity(null));
         assertNull(mapper.toResponse(null));
+        assertNull(mapper.toGetAllClientsResponse(null));
     }
 }

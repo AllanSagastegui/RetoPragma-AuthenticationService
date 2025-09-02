@@ -16,6 +16,7 @@ import pe.com.ask.model.user.gateways.UserRepository;
 import pe.com.ask.usecase.exception.RoleNotFoundException;
 import pe.com.ask.usecase.exception.UserAlreadyExistsException;
 import pe.com.ask.usecase.utils.DEFAULT_ROLE;
+import pe.com.ask.usecase.utils.logmessages.SignUpUseCaseLog;
 import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
 
@@ -24,6 +25,7 @@ import java.time.LocalDate;
 import java.util.UUID;
 
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
@@ -125,4 +127,43 @@ class SignUpUseCaseTest {
                 .expectError(RoleNotFoundException.class)
                 .verify();
     }
+
+    @Test
+    @DisplayName("Should throw UserAlreadyExistsException when DNI already exists (existingUser != null branch)")
+    void signUpUserDniExistsBranch() {
+        when(userRepository.findByEmail(testUser.getEmail())).thenReturn(Mono.empty());
+        when(userRepository.findByDni(testUser.getDni())).thenReturn(Mono.just(testUser));
+
+        when(roleRepository.findByName(DEFAULT_ROLE.CLIENT.toString())).thenReturn(Mono.empty());
+
+        when(transactionalGateway.executeInTransaction(any(Mono.class)))
+                .thenAnswer(invocation -> ((Mono<?>) invocation.getArgument(0)));
+
+        StepVerifier.create(signUpUseCase.signUpUser(testUser))
+                .expectError(UserAlreadyExistsException.class)
+                .verify();
+
+        verify(customLogger).trace(SignUpUseCaseLog.USER_ALREADY_EXISTS_DNI, testUser.getDni());
+    }
+
+    @Test
+    @DisplayName("Should continue flow when DNI does not exist (return Mono.just(\"Continue\"))")
+    void signUpUserDniNotExistsContinueFlow() {
+        when(userRepository.findByEmail(testUser.getEmail())).thenReturn(Mono.empty());
+
+        when(userRepository.findByDni(testUser.getDni())).thenReturn(Mono.empty());
+        when(roleRepository.findByName(DEFAULT_ROLE.CLIENT.toString())).thenReturn(Mono.just(clientRole));
+        when(passwordHasher.hash(testUser.getPassword())).thenReturn("hashedPassword");
+        when(userRepository.signUp(any(User.class))).thenReturn(Mono.just(testUser));
+
+        when(transactionalGateway.executeInTransaction(any(Mono.class)))
+                .thenAnswer(invocation -> ((Mono<?>) invocation.getArgument(0)));
+
+        StepVerifier.create(signUpUseCase.signUpUser(testUser))
+                .expectNextMatches(user -> user.getEmail().equals("test@example.com") &&
+                        user.getPassword().equals("hashedPassword") &&
+                        user.getIdRole().equals(clientRole.getId()))
+                .verifyComplete();
+    }
+
 }

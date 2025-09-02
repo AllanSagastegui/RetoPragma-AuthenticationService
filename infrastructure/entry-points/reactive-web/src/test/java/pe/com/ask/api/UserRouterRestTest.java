@@ -1,5 +1,6 @@
 package pe.com.ask.api;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -7,13 +8,17 @@ import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.reactive.WebFluxTest;
-import org.springframework.context.ApplicationContext;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
 import org.springframework.http.MediaType;
+import org.springframework.security.config.web.server.ServerHttpSecurity;
+import org.springframework.security.web.server.SecurityWebFilterChain;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.reactive.server.WebTestClient;
 import pe.com.ask.api.dto.request.SignInDTO;
 import pe.com.ask.api.dto.request.SignUpDTO;
+import pe.com.ask.api.dto.response.GetAllClientsResponse;
 import pe.com.ask.api.dto.response.SignInResponse;
 import pe.com.ask.api.dto.response.SignUpResponse;
 import pe.com.ask.api.exception.GlobalWebExceptionHandler;
@@ -21,26 +26,30 @@ import pe.com.ask.api.exception.model.ValidationException;
 import pe.com.ask.api.exception.service.ValidationService;
 import pe.com.ask.api.mapper.TokenMapper;
 import pe.com.ask.api.mapper.UserMapper;
+import pe.com.ask.model.baseexception.BaseException;
 import pe.com.ask.model.gateways.CustomLogger;
 import pe.com.ask.model.token.Token;
 import pe.com.ask.model.user.User;
 import pe.com.ask.usecase.getusersbyid.GetUsersByIdUseCase;
 import pe.com.ask.usecase.signin.SignInUseCase;
 import pe.com.ask.usecase.signup.SignUpUseCase;
+import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.Map;
 import java.util.UUID;
 
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.*;
+import static org.mockito.Mockito.when;
 
 @ContextConfiguration(classes = {
         UserRouterRest.class,
         UserHandler.class,
-        GlobalWebExceptionHandler.class
+        GlobalWebExceptionHandler.class,
+        UserRouterRestTest.SecurityOverride.class
 })
 @WebFluxTest
 class UserRouterRestTest {
@@ -48,8 +57,16 @@ class UserRouterRestTest {
     @Autowired
     private WebTestClient webTestClient;
 
-    @Autowired
-    private ApplicationContext context;
+    @Configuration
+    static class SecurityOverride {
+        @Bean
+        public SecurityWebFilterChain securityWebFilterChain(ServerHttpSecurity http) {
+            return http
+                    .csrf(ServerHttpSecurity.CsrfSpec::disable)
+                    .authorizeExchange(auth -> auth
+                            .anyExchange().permitAll()).build();
+        }
+    }
 
     @MockitoBean private SignUpUseCase signUpUseCase;
     @MockitoBean private SignInUseCase signInUseCase;
@@ -125,13 +142,6 @@ class UserRouterRestTest {
                 .thenReturn(Mono.just(tokenEntity));
         Mockito.when(tokenMapper.toResponse(any(Token.class)))
                 .thenReturn(signInResponse);
-
-        UserHandler handler = new UserHandler(userMapper, tokenMapper, validationService, customLogger, signUpUseCase, signInUseCase, getUsersByIdUseCase);
-        webTestClient = WebTestClient.bindToApplicationContext(context)
-                .configureClient()
-                .baseUrl("/api/v1")
-                .build();
-
     }
 
     @Test
@@ -233,5 +243,124 @@ class UserRouterRestTest {
                 .expectStatus().is5xxServerError()
                 .expectBody()
                 .jsonPath("$.status").isEqualTo("500");
+    }
+
+    @Test
+    @DisplayName("Should return 200 OK when POST /usuarios/by-ids request is successful")
+    void testGetAllClientsEndpointSuccess() {
+        UUID userId = UUID.randomUUID();
+
+        User userEntity = new User();
+        userEntity.setId(userId);
+        userEntity.setName("Allan");
+        userEntity.setLastName("Sagastegui");
+        userEntity.setDni("12345678");
+        userEntity.setEmail("allan.sagastegui@test.com");
+        userEntity.setBaseSalary(new BigDecimal("2500.50"));
+
+        Mockito.when(getUsersByIdUseCase.getUsersByIds(anyList()))
+                .thenReturn(Flux.just(userEntity));
+
+        Mockito.when(userMapper.toGetAllClientsResponse(any(User.class)))
+                .thenReturn(new GetAllClientsResponse(
+                        userEntity.getId(),
+                        userEntity.getName(),
+                        userEntity.getLastName(),
+                        userEntity.getDni(),
+                        userEntity.getEmail(),
+                        userEntity.getBaseSalary()
+                ));
+
+        webTestClient.post()
+                .uri("/api/v1/usuarios/by-ids")
+                .exchange()
+                .expectStatus().isOk()
+                .expectBodyList(GetAllClientsResponse.class)
+                .value(clients -> {
+                    Assertions.assertThat(clients).hasSize(1);
+                    Assertions.assertThat(clients.get(0).email()).isEqualTo(userEntity.getEmail());
+                });
+    }
+
+    @Test
+    @DisplayName("Should return 500 and log error when /usuarios/by-ids use case fails")
+    void testGetAllClientsEndpointUnexpectedException() {
+        UUID id = UUID.randomUUID();
+
+        Mockito.when(getUsersByIdUseCase.getUsersByIds(anyList()))
+                .thenReturn(Flux.error(new RuntimeException("boom")));
+
+        webTestClient.post()
+                .uri("/api/v1/usuarios/by-ids")
+                .contentType(MediaType.APPLICATION_JSON)
+                .bodyValue(java.util.List.of(id))
+                .exchange()
+                .expectStatus().is5xxServerError()
+                .expectBody()
+                .jsonPath("$.status").isEqualTo("500");
+
+        Mockito.verify(customLogger).trace(
+                pe.com.ask.api.utils.logmessages.GetAllClientsLog.ERROR,
+                "boom"
+        );
+    }
+
+    @Test
+    @DisplayName("Should wrap non-BaseException into UnexpectedException on sign-up")
+    void testSignUpUnexpectedExceptionWrapped() {
+        RuntimeException original = new RuntimeException("unexpected");
+
+        Mockito.when(validationService.validate(any(SignUpDTO.class)))
+                .thenReturn(Mono.error(original));
+
+        webTestClient.post()
+                .uri("/api/v1/usuarios")
+                .contentType(MediaType.APPLICATION_JSON)
+                .bodyValue(signUpDTO)
+                .exchange()
+                .expectStatus().is5xxServerError()
+                .expectBody()
+                .jsonPath("$.status").isEqualTo("500");
+    }
+
+
+    @Test
+    void testHandle_BaseException() {
+        BaseException ex = new BaseException("CODE", "TITLE", "MESSAGE", 404, null){
+
+        };
+
+        when(validationService.validate(any(SignUpDTO.class)))
+                .thenReturn(Mono.error(ex));
+
+        webTestClient.post()
+                .uri("/api/v1/usuarios")
+                .contentType(MediaType.APPLICATION_JSON)
+                .bodyValue(signUpDTO)
+                .exchange()
+                .expectStatus().isEqualTo(404)
+                .expectBody();
+    }
+
+    @Test
+    void testHandle_BaseExceptionWithNullTimestamp() throws JsonProcessingException {
+        BaseException ex = new BaseException("CODE", "TITLE", "MESSAGE", 400, Map.of()) {
+            @Override
+            public LocalDateTime getTimestamp() {
+                return null;
+            }
+        };
+
+        when(validationService.validate(any(SignUpDTO.class)))
+                .thenReturn(Mono.error(ex));
+
+        webTestClient.post()
+                .uri("/api/v1/usuarios")
+                .contentType(MediaType.APPLICATION_JSON)
+                .bodyValue(signUpDTO)
+                .exchange()
+                .expectStatus().isEqualTo(400)
+                .expectBody()
+                .jsonPath("$.timestamp").exists();
     }
 }

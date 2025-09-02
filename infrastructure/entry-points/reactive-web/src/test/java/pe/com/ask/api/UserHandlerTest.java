@@ -6,26 +6,33 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
+import org.springframework.core.ParameterizedTypeReference;
+import org.springframework.http.HttpStatus;
 import org.springframework.web.reactive.function.server.ServerRequest;
 import org.springframework.web.reactive.function.server.ServerResponse;
 import pe.com.ask.api.dto.request.SignInDTO;
 import pe.com.ask.api.dto.request.SignUpDTO;
+import pe.com.ask.api.dto.response.GetAllClientsResponse;
 import pe.com.ask.api.dto.response.SignInResponse;
 import pe.com.ask.api.dto.response.SignUpResponse;
+import pe.com.ask.api.exception.model.UnexpectedException;
 import pe.com.ask.api.exception.service.ValidationService;
 import pe.com.ask.api.mapper.TokenMapper;
 import pe.com.ask.api.mapper.UserMapper;
+import pe.com.ask.model.baseexception.BaseException;
 import pe.com.ask.model.gateways.CustomLogger;
 import pe.com.ask.model.user.User;
 import pe.com.ask.model.token.Token;
 import pe.com.ask.usecase.getusersbyid.GetUsersByIdUseCase;
 import pe.com.ask.usecase.signin.SignInUseCase;
 import pe.com.ask.usecase.signup.SignUpUseCase;
+import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.util.List;
 import java.util.UUID;
 
 import static org.mockito.ArgumentMatchers.any;
@@ -132,6 +139,18 @@ class UserHandlerTest {
     }
 
     @Test
+    @DisplayName("Should return error on SignUp when validation fails")
+    void testListenPOSTSignUpUseCaseValidationError() {
+        when(validationService.validate(any(SignUpDTO.class)))
+                .thenReturn(Mono.error(new RuntimeException("Validation failed")));
+        when(serverRequest.bodyToMono(SignUpDTO.class)).thenReturn(Mono.just(signUpDTO));
+
+        StepVerifier.create(userHandler.listenPOSTSignUpUseCase(serverRequest))
+                .expectErrorMatches(UnexpectedException.class::isInstance)
+                .verify();
+    }
+
+    @Test
     @DisplayName("Should handle POST /login request and return ServerResponse")
     void testListenPOSTSignInUseCase() {
         when(serverRequest.bodyToMono(SignInDTO.class)).thenReturn(Mono.just(signInDTO));
@@ -145,19 +164,45 @@ class UserHandlerTest {
         verify(signInUseCase, times(1)).signInUser(signInDTO.email(), signInDTO.password());
     }
 
-    /*@Test
-    @DisplayName("Should return empty Mono when signUpDoc is invoked")
-    void testSignUpDocReturnsEmpty() {
-        StepVerifier.create(userHandler.signUpDoc(signUpDTO))
-                .expectNextCount(0)
-                .verifyComplete();
+    @Test
+    @DisplayName("Should return error on SignIn when signInUseCase fails")
+    void testListenPOSTSignInUseCaseError() {
+        when(signInUseCase.signInUser(anyString(), anyString()))
+                .thenReturn(Mono.error(new RuntimeException("SignIn failed")));
+        when(serverRequest.bodyToMono(SignInDTO.class)).thenReturn(Mono.just(signInDTO));
+
+        StepVerifier.create(userHandler.listenPOSTSignInUseCase(serverRequest))
+                .expectErrorMatches(UnexpectedException.class::isInstance)
+                .verify();
     }
 
     @Test
-    @DisplayName("Should return empty Mono when signInDoc is invoked")
-    void testSignInDocReturnsEmpty() {
-        StepVerifier.create(userHandler.signInDoc(signInDTO))
-                .expectNextCount(0)
+    @DisplayName("Should handle GET /clientes request and return ServerResponse")
+    void testListenGETAllClientsUseCase() {
+        UUID userId = UUID.randomUUID();
+
+        var userList = List.of(userEntity);
+        when(getUsersByIdUseCase.getUsersByIds(anyList())).thenReturn(Flux.fromIterable(userList));
+        when(userMapper.toGetAllClientsResponse(any(User.class)))
+                .thenReturn(new GetAllClientsResponse(
+                        userEntity.getId(),
+                        userEntity.getName(),
+                        userEntity.getLastName(),
+                        userEntity.getDni(),
+                        userEntity.getEmail(),
+                        userEntity.getBaseSalary()
+                ));
+
+        when(serverRequest.bodyToMono(new ParameterizedTypeReference<List<UUID>>() {}))
+                .thenReturn(Mono.just(List.of(userId)));
+
+        Mono<ServerResponse> result = userHandler.listenGETAllClientsUseCase(serverRequest);
+
+        StepVerifier.create(result)
+                .expectNextMatches(resp -> resp.statusCode() == HttpStatus.OK)
                 .verifyComplete();
-    }*/
+
+        verify(getUsersByIdUseCase, times(1)).getUsersByIds(List.of(userId));
+        verify(userMapper, times(1)).toGetAllClientsResponse(userEntity);
+    }
 }
