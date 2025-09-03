@@ -9,6 +9,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
 import org.springframework.web.bind.annotation.ResponseStatus;
+import pe.com.ask.api.doc.exception.UnauthorizedExceptionDoc;
 import pe.com.ask.api.doc.exception.UnexpectedExceptionDoc;
 import pe.com.ask.api.doc.exception.UserAlreadyExistsExceptionDoc;
 import pe.com.ask.api.doc.exception.ValidationExceptionDoc;
@@ -23,7 +24,8 @@ public class SignUpDoc {
     @ResponseStatus(HttpStatus.CREATED)
     @Operation(
             summary = "Sign-Up a new user",
-            description = "Endpoint for user registration."
+            description = "Endpoint for user registration.",
+            security = {@io.swagger.v3.oas.annotations.security.SecurityRequirement(name = "bearerAuth")}
     )
     @ApiResponses(value = {
             @ApiResponse(
@@ -38,6 +40,12 @@ public class SignUpDoc {
                             schema = @Schema(
                                     implementation = ValidationExceptionDoc.class)
                     )
+            ),
+            @ApiResponse(
+                    responseCode = "401",
+                    description = "Unauthorized: missing or invalid JWT token",
+                    content = @Content(
+                            schema = @Schema(implementation = UnauthorizedExceptionDoc.class))
             ),
             @ApiResponse(responseCode = "409",
                     description = "Conflict: user already exists",

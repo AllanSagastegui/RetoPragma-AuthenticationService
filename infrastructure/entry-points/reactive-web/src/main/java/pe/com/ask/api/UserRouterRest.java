@@ -8,6 +8,7 @@ import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.reactive.function.server.RouterFunction;
 import org.springframework.web.reactive.function.server.ServerResponse;
+import pe.com.ask.api.doc.GetAllClientsDoc;
 import pe.com.ask.api.doc.SignInDoc;
 import pe.com.ask.api.doc.SignUpDoc;
 import pe.com.ask.api.utils.routes.Routes;
@@ -20,16 +21,22 @@ public class UserRouterRest {
     @Bean
     @RouterOperations({
             @RouterOperation(
-                    path = "/api/v1/usuarios",
+                    path = Routes.SIGNUP,
                     method = RequestMethod.POST,
                     beanClass = SignUpDoc.class,
                     beanMethod = "signUpDoc"
             ),
             @RouterOperation(
-                    path = "/api/v1/login",
+                    path = Routes.SIGNIN,
                     method = RequestMethod.POST,
                     beanClass = SignInDoc.class,
                     beanMethod = "signInDoc"
+            ),
+            @RouterOperation(
+                    path = Routes.GETUSERSBYID,
+                    method = RequestMethod.POST,
+                    beanClass = GetAllClientsDoc.class,
+                    beanMethod = "getAllClientsDoc"
             )
     })
     public RouterFunction<ServerResponse> userRouterFunction(UserHandler userHandler) {
