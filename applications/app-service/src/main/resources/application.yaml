@@ -35,9 +35,8 @@ routes:
     usuarios: "/api/v1/usuarios"
 adapters:
   r2dbc:
-    host: "localhost"
+    host: "postgres-db"
     port: 5432
-    database: "auth_pragma"
-    schema: "public"
+    database: ${DB_NAME}
     username: ${DB_USER}
     password: ${DB_PASSWORD}
