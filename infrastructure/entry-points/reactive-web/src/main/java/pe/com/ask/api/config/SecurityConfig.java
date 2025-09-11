@@ -34,7 +34,7 @@ public class SecurityConfig {
                                 Routes.TEST
                         ).permitAll()
                         .pathMatchers(HttpMethod.POST, Routes.SIGNUP).hasAnyRole(Roles.ADMIN, Roles.ADVISOR)
-                        .pathMatchers(HttpMethod.POST, Routes.GETUSERSBYID).hasAnyRole(Roles.ADMIN, Roles.ADVISOR)
+                        .pathMatchers(HttpMethod.POST, Routes.GETUSERSBYID).hasAnyRole(Roles.ADMIN, Roles.ADVISOR, Roles.CLIENT)
                         .anyExchange()
                         .authenticated())
                 .addFilterAt(jwtFilter, SecurityWebFiltersOrder.AUTHENTICATION)
