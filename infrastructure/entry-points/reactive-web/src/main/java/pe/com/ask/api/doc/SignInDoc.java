@@ -18,13 +18,20 @@ import pe.com.ask.api.dto.response.SignUpResponse;
 import reactor.core.publisher.Mono;
 
 @Component
-@Schema(description = "Documentation for user sign-in endpoint")
+@Schema(
+        name = "SignInDoc",
+        description = "API documentation for user authentication (Sign-In). " +
+                "This endpoint allows users to log in with their registered email and password " +
+                "to obtain a valid JWT token for accessing secured endpoints."
+)
 public class SignInDoc {
 
     @ResponseStatus(HttpStatus.OK)
     @Operation(
             summary = "Sign-In user",
-            description = "Endpoint for user authentication with email and password."
+            description = "Authenticates a user using their email and password. " +
+                    "If the credentials are valid, a JWT token is returned along with user details. " +
+                    "This token must be included in the `Authorization` header for subsequent secured API calls."
     )
     @ApiResponses(value = {
             @ApiResponse(
@@ -55,7 +62,9 @@ public class SignInDoc {
             )
     })
     public Mono<SignInResponse> signInDoc(
-            @RequestBody(description = "Sign In - Credentials for user login")
+            @RequestBody(description = "Sign-In credentials including the user's email and password. " +
+                    "Both fields are mandatory and must match a registered user."
+            )
             @org.springframework.web.bind.annotation.RequestBody SignInDTO dto) {
         return Mono.empty();
     }

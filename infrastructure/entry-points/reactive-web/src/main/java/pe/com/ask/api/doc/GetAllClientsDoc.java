@@ -19,13 +19,22 @@ import java.util.List;
 import java.util.UUID;
 
 @Component
-@Schema(description = "Documentation for get all clients endpoint")
+@Schema(
+        name = "GetAllClientsDoc",
+        description = "API documentation for retrieving multiple clients by their unique identifiers (UUIDs). " +
+                "This endpoint allows batch retrieval of client information in a single request, making it efficient " +
+                "for services or applications that need details of multiple clients at once. " +
+                "Authentication via Bearer token is required."
+)
 public class GetAllClientsDoc {
 
     @ResponseStatus(HttpStatus.OK)
     @Operation(
             summary = "Get all clients by IDs",
-            description = "Retrieves a list of clients given their UUIDs. Requires Bearer token authentication.",
+            description = "Retrieves detailed information for a list of clients identified by their UUIDs. " +
+                    "This operation is useful when fetching multiple client records in a single call " +
+                    "to optimize performance and reduce network overhead. " +
+                    "Requires Bearer token authentication.",
             security = {@SecurityRequirement(name = "bearerAuth")}
     )
     @ApiResponses(value = {

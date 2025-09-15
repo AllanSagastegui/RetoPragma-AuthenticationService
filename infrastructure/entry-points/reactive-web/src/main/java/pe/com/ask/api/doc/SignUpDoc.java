@@ -18,13 +18,21 @@ import pe.com.ask.api.dto.response.SignUpResponse;
 import reactor.core.publisher.Mono;
 
 @Component
-@Schema(description = "Documentation for user sign-up endpoint")
+@Schema(
+        name = "SignUpDoc",
+        description = "API documentation for user registration (Sign-Up). " +
+                "This endpoint allows new users to create an account by providing the required details " +
+                "such as name, email, and password. Once registered, the user can authenticate " +
+                "and access secured endpoints."
+)
 public class SignUpDoc {
 
     @ResponseStatus(HttpStatus.CREATED)
     @Operation(
             summary = "Sign-Up a new user",
-            description = "Endpoint for user registration.",
+            description = "Creates a new user account in the system with the provided registration details. " +
+                    "If the registration is successful, the response will contain the newly created user information. " +
+                    "Validation rules apply to fields such as email format and password strength.",
             security = {@io.swagger.v3.oas.annotations.security.SecurityRequirement(name = "bearerAuth")}
     )
     @ApiResponses(value = {
@@ -62,7 +70,9 @@ public class SignUpDoc {
             )
     })
     public Mono<SignUpResponse> signUpDoc(
-            @RequestBody(description = "Sign Up - Data required to register a new user")
+            @RequestBody(description = "Sign-Up request body containing user registration details. " +
+                    "Fields such as name, email, and password are mandatory."
+            )
             @org.springframework.web.bind.annotation.RequestBody SignUpDTO dto) {
         return Mono.empty();
     }
